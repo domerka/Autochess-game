@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Tile
+  - Cahracter
+  - RaycastTag
+  - Occupied
+  - Enemy
+  - Ally
+  - OccupiedByEnemy
+  - OccupiedByAlly
+  - Free
+  - OnBoard
+  - ChampionPicture
+  - FreeBoard
+  - GameControl
+  - CharInstantiator
+  - Copy
+  - OnBench
+  - FreeBench
+  - SideBarImage
+  - SideBarImageText
+  - UIController
+  - LeftSideBar
+  - Canvas
+  - SkillTree
+  - Grid
+  - Payer
+  - PlayerController
+  - LevelProgressionBarImage
+  - Projectile
+  - Garbage
+  - Dead
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0

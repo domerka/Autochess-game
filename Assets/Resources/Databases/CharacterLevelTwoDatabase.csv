@@ -1,0 +1,3 @@
+﻿name;attackRange;attackSpeed;className;traitName;cost;abilityDescription;health;maxMana;startingMana;armor;magicResist;critChance;attackDamage;magicDamage;ranged;projectileName
+boxer;1;1,5;boxer;trait_name1;3;abilityDesc;800;200;120;60;55;30;120;150;0;null
+archer;5;1,3;archer;trait_name2;3;abilityDesc;500;200;120;25;30;25;100;80;1;arrow

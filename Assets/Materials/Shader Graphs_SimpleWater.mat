@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Shader Graphs_SimpleWater
+  m_Shader: {fileID: -6465566751694194690, guid: a447bd9e26b6e9642aacd50ade8cd2e4, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - Vector1_18167b2121304b858da3e36313c56b2d: 5
+    - Vector1_8ac95db0055d4c51b2f859fc65baec58: 7
+    - Vector1_daa4efb24fb14c6d81d4d309310480a4: 1
+    - Vector1_f52ccf04723145fe9d375c613d9373f5: 0.2
+    - _RippleDensity: 7
+    - _RippleSlimness: 5
+    - _RippleSpeed: 5
+    - _Transparency: 0.3
+    m_Colors:
+    - Color_9c17c20c760e410397008ebca1bdad62: {r: 0.3137255, g: 1.592157, b: 2, a: 0}
+    - Color_a05aa43012d248baae37865e99899230: {r: 0.1915717, g: 0.6810753, b: 0.990566, a: 0}
+    - _BaseColor: {r: 0, g: 0.6116977, b: 0.7254902, a: 1}
+    - _RippleColor: {r: 0.004271993, g: 0.7658728, b: 0.9056604, a: 1}
+    - _Transparency: {r: 0.3, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
