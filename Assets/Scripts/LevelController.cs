@@ -17,13 +17,10 @@ public class LevelController : MonoBehaviour
     private UIController uiController;
 
     private int opponentStrength;
-
-    int stageCounter;
-
-    float currentTime;
-    float time;
-
-    private int numOfStages = 5;
+    private int stageCounter;
+    private float currentTime;
+    private float time;
+    private int numOfStages;
 
     //Stage lengths
     [SerializeField]private float preparationStageLength;
@@ -75,7 +72,9 @@ public class LevelController : MonoBehaviour
         }
         
         //upgrade units after fight, 1 second into preparationstage
-        if(currentTime <= 9 && isPreparationStage && currentTime >= 8) gameController.CheckCharacterUpgrades();
+        if(currentTime <= preparationStageLength-1.0f && isPreparationStage && currentTime >= preparationStageLength-2.0f) gameController.CheckCharacterUpgrades();
+        
+
         
         if(currentTime <= 0 || (gameController.CheckWhetherFightIsOver() && gameController.GetFightIsOn()))
         {
@@ -156,6 +155,15 @@ public class LevelController : MonoBehaviour
     {
         time = timeToSet;
         currentTime = time;
+    }
+
+    public void SkipPreparationStage()
+    {
+        if(isPreparationStage && currentTime > preparationStageLength/2.0f && currentTime < preparationStageLength - 1.0f)
+        {
+            currentTime = 0.0f;
+            gameController.AddGold(1);
+        }
     }
 
 

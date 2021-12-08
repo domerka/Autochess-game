@@ -10,9 +10,12 @@ public class InputController : MonoBehaviour
     private KeyCode openSettingsInput;
     private string switchRightSidePanelPanelInput;
     private string sellCharacterInput;
+    private string pauseGameInput;
+    private string skipPreparationStageInput;
 
     private UIController uiController;
     private GameController gameController;
+    private LevelController levelController;
 
 
     private void Awake()
@@ -23,6 +26,8 @@ public class InputController : MonoBehaviour
         openSettingsInput = KeyCode.Escape;
         switchRightSidePanelPanelInput = "1";
         sellCharacterInput = "e";
+        pauseGameInput = "p";
+        skipPreparationStageInput = "s";
 
     }
 
@@ -30,6 +35,7 @@ public class InputController : MonoBehaviour
     {
         uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
         gameController = GameObject.FindGameObjectWithTag("GameControl").GetComponent<GameController>();
+        levelController = GameObject.FindGameObjectWithTag("UIController").GetComponent<LevelController>();
     }
 
     private void Update()
@@ -46,6 +52,10 @@ public class InputController : MonoBehaviour
         if (Input.GetKeyDown(sellCharacterInput)) SellCharacter();
         //Open settings menu 'Esc'
         if (Input.GetKeyDown(openSettingsInput)) uiController.OpenSettingsPanel();
+        //Pause game 'p'
+        if (Input.GetKeyDown(pauseGameInput)) Time.timeScale = Time.timeScale == 0 ? 1 : 0;
+        //Skip prep stage for gold 's'
+        if (Input.GetKeyDown(skipPreparationStageInput)) levelController.SkipPreparationStage();
     }
 
     private void SellCharacter()
