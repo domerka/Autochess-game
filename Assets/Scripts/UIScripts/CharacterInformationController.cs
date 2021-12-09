@@ -48,7 +48,7 @@ public class CharacterInformationController : MonoBehaviour
 
             for (int i = 0;i < 8; i++)
             {
-                inst.transform.FindDeepChild(informationNames[i] + "Text").GetComponent<TextMeshProUGUI>().text = characterController.GetStats(informationNames[i]);
+                inst.transform.FindDeepChild(informationNames[i] + "Text").GetComponent<TextMeshProUGUI>().text = characterController.GetStatsString(informationNames[i]);
             }
 
             inst.layer = 5;

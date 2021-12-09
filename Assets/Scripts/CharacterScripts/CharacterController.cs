@@ -26,6 +26,8 @@ public class CharacterController : MonoBehaviour
     public int attackDamage;
     public int critChance;
 
+    public float moveSpeed;
+
     public float damageDealt;
     public int damageHealed;
 
@@ -45,12 +47,24 @@ public class CharacterController : MonoBehaviour
 
     public GameObject standingTile;
 
+    public float baseHealing;
+
+    public bool stunned;
+
+    private HealthBar healthBar;
+    private ManaBar manaBar;
+
     private void Awake()
     {
         draggable = true;
         sellable = true;
         upgradedStats = new List<string>();
         fightsPlayed = 0;
+        baseHealing = 0;
+        healthBar = transform.gameObject.GetComponent<HealthBar>();
+        manaBar = transform.gameObject.GetComponent<ManaBar>();
+        moveSpeed = 2.0f;
+
     }
 
     private void Start()
@@ -115,7 +129,7 @@ public class CharacterController : MonoBehaviour
         projectileName = character.projectileName;
     }
 
-    public string GetStats(string statName)
+    public string GetStatsString(string statName)
     {
         switch (statName)
         {
@@ -200,6 +214,61 @@ public class CharacterController : MonoBehaviour
     public bool isRanged()
     {
         return ranged;
+    }
+
+    public void TakeDamage(float amount)
+    {
+        healthBar.TakeDamage(amount);
+    }
+
+    public void HealDamage(float amount)
+    {
+        healthBar.HealDamage(amount);
+    }
+
+    public void SetMana(float amount)
+    {
+        manaBar.SetMana(amount);
+    }
+
+    public void AddMana(float amount)
+    {
+        manaBar.AddMana(amount);
+    }
+    public bool CastReady()
+    {
+        return manaBar.CastReady();
+    }
+
+    public void Stun()
+    {
+        stunned = true;
+    }
+
+    public void KnockUp()
+    {
+        stunned = true;
+
+    }
+
+    public void SlowAttackSpeed(float amount)
+    {
+        attackSpeed -= amount;
+    }
+
+    public void SlowMovementSpeed(float amount)
+    {
+        moveSpeed -= amount;
+    }
+
+    public void SetBaseHealing(float amount)
+    {
+        baseHealing = amount;
+    }
+
+    public void AddDamage(int amount)
+    {
+        attackDamage += amount;
     }
 
 }

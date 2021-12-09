@@ -10,8 +10,6 @@ public class MoveObject : MonoBehaviour
 
     private List<GameObject> gridList;
     private GameObject[] enemys;
-
-    [SerializeField] private float runningSpeed = 1.0f;
     [SerializeField] private float rotationSpeed;
     private float nextAttack = 0;
     private float attackInterval = 0.7f;
@@ -26,9 +24,10 @@ public class MoveObject : MonoBehaviour
 
     private Animator anim;
 
-    private ManaBar manaBar;
+    private GameObject grid;
 
-    GameObject grid;
+    private float stunCurrent;
+    private float stunDuration;
 
     // Start is called before the first frame update
     void Start()
@@ -36,17 +35,27 @@ public class MoveObject : MonoBehaviour
         gridList = new List<GameObject>();
         anim = GetComponent<Animator>();
         character = gameObject.GetComponent<CharacterController>();
-        manaBar = gameObject.GetComponent<ManaBar>();
         gameController = GameObject.FindGameObjectWithTag("GameControl").GetComponent<GameController>();
-        runningSpeed = 2.0f;
         nextAttack = character.attackSpeed;
         standingTile = character.standingTile;
+        stunCurrent = 0.0f;
         rotationSpeed = 10.0f;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(Time.time > stunCurrent && character.stunned)
+        {
+            stunCurrent += 0.1f;
+            if (stunCurrent >= stunDuration)
+            {
+                character.stunned = false;
+                stunCurrent = 0.0f;
+            }
+        }
+
+        if (character.stunned) return;
         //Find the grid
         if (grid == null)
         {
@@ -108,7 +117,7 @@ public class MoveObject : MonoBehaviour
                 AutoAttack();
             }
             //Cast ability
-            if (manaBar.castReady())
+            if (character.CastReady())
             {
                 CastAbility();
             }
@@ -126,7 +135,7 @@ public class MoveObject : MonoBehaviour
     //TODO
     private void CastAbility()
     {
-        manaBar.setMana(0);
+        character.SetMana(0);
         AbilityController.CastAbility(character.name);
     }
 
@@ -146,7 +155,7 @@ public class MoveObject : MonoBehaviour
 
         gameController.UpdateDamageDealt(character);
         
-
+        //Projectile shooting
         if (character.isRanged())
         {
             if(Time.time > nextAttack)
@@ -180,10 +189,10 @@ public class MoveObject : MonoBehaviour
         if (!(target.GetComponent<CharacterController>().armor > damage))
         {
             damage -= target.GetComponent<CharacterController>().armor;
-            target.GetComponent<HealthBar>().currentHealth -= damage ;
+            target.GetComponent<HealthBar>().TakeDamage(damage);
             character.damageDealt += damage;
             CreateDamagePopUp(damage);
-            manaBar.addMana(20);
+            character.AddMana(20);
         }
         else
         {
@@ -191,6 +200,8 @@ public class MoveObject : MonoBehaviour
         }
     }
 
+
+    //Turn it into an individual class
     private void CreateDamagePopUp(float damage)
     {
         Instantiate(Resources.Load("Prefabs/DamagePopUp") as GameObject, target.transform.position, Quaternion.identity).GetComponent<DamagePopUp>().SetStyle(damage);
@@ -210,7 +221,7 @@ public class MoveObject : MonoBehaviour
         Vector3 newDir = Vector3.RotateTowards(gameObject.transform.forward, tileToMoveTo.transform.position - gameObject.transform.position, singleStep, 0.0f);
         gameObject.transform.rotation = Quaternion.LookRotation(newDir);
 
-        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, tileToMoveTo.transform.position, Time.deltaTime * runningSpeed);
+        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, tileToMoveTo.transform.position, Time.deltaTime * character.moveSpeed);
         character.standingTile = tileToMoveTo;
         standingTile = tileToMoveTo;
 

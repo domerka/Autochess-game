@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ManaBar : MonoBehaviour
 {
-    public float currentMana;
+    private float currentMana;
     private float maxMana;
 
     public Slider slider;
@@ -16,38 +16,27 @@ public class ManaBar : MonoBehaviour
         slider = gameObject.transform.FindDeepChild("ManaBar").GetComponent<Slider>();
     }
 
-
-    private void Update()
-    {
-        slider.value = CalculateMana();
-
-        if (currentMana > maxMana) currentMana = maxMana;
-    }
     private float CalculateMana()
     {
         return currentMana / maxMana;
     }
 
-    public void setMaxMana(int _maxMana)
-    {
-        maxMana = _maxMana;
-
-        currentMana = maxMana;
-    }
-
-    public bool castReady()
+    public bool CastReady()
     {
         return currentMana == maxMana;
     }
 
-    public void setMana(int amount)
+    public void SetMana(float amount)
     {
         currentMana = amount;
+        slider.value = CalculateMana();
     }
 
-    public void addMana(int amount)
+    public void AddMana(float amount)
     {
-        currentMana += amount;
+        currentMana += amount; 
+        if (currentMana > maxMana) currentMana = maxMana;
+        slider.value = CalculateMana();
     }
 
 }
