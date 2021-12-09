@@ -15,7 +15,6 @@ public class Garbage : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        print(true);
         uiController.isOverGarbage = true;
     }
 

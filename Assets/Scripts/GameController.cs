@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour
     //-------------------Basic variables
     private int level;
     private int gold;
+    private int teamSize;
     [SerializeField]private bool fightIsOn;
     private int xp;
     private int numberOfChampionsOnBoard;
@@ -32,19 +33,28 @@ public class GameController : MonoBehaviour
 
     private int[] fightStreakGold;
 
+    private Dictionary<int, int[]> shopOdds;
+
     private void Awake()
     {
         spawnEnemyDictionary = new Dictionary<int, string[]>();
         characterNames = new string[2] { "boxer", "archer" };
-        fightStreakGold = new int[6] {0,1,1,2,3,4};
+        
         level = 1;
         gold = 33;
+        teamSize = 1;
         numberOfChampionsOnBoard = 0;
         nextIncome = 5;
         xp = 2;
-        xpForNextLevel = new int[] { 4, 16, 24, 36, 60, 84, 100, 120, 132, 140 };
 
+        fightStreakGold = new int[6] { 0, 1, 1, 2, 3, 4 };
+        xpForNextLevel = new int[] { 4, 16, 24, 36, 60, 84, 100, 120, 132, 140 };
+        shopOdds = new Dictionary<int, int[]>();
         savedAlliesBeforeFight = new List<CharacterController>();
+
+        CreateShopOdss();
+        CreateCharacterPool();
+        CreateSpawnEnemydictionary();
     }
 
     // Start is called before the first frame update
@@ -52,19 +62,17 @@ public class GameController : MonoBehaviour
     {
         uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
         player = GameObject.FindGameObjectWithTag("PlayerController").GetComponent<PlayerController>();
-
-        CreateCharacterPool();
-        CreataSpawnEnemydictionary();
     }
 
     // Update is called once per frame
     void Update()
     {
         numberOfChampionsOnBoard = GameObject.FindGameObjectsWithTag("Ally").Length;
+        uiController.UpdateTeamSizeUI();
     }
 
     //-------------------------------------------Initialising functions
-    private void CreataSpawnEnemydictionary()
+    private void CreateSpawnEnemydictionary()
     {   //From 0-5 weakest, 5-10 stronger and so on... 
         //TODO
         string[] position = new string[] {"00","01","04"};
@@ -78,6 +86,19 @@ public class GameController : MonoBehaviour
         championPool.Add("boxer", 30);
         championPool.Add("archer", 30);
     }
+    private void CreateShopOdss()
+    {
+        shopOdds.Add(1, new int[] { 100, 0, 0, 0, 0 });
+        shopOdds.Add(2, new int[] { 100, 0, 0, 0, 0 });
+        shopOdds.Add(3, new int[] { 75, 15, 10, 0, 0 });
+        shopOdds.Add(4, new int[] { 50, 30, 20, 0, 0 });
+        shopOdds.Add(5, new int[] { 35, 30, 30, 5, 0 });
+        shopOdds.Add(6, new int[] { 20, 35, 35, 10, 0 });
+        shopOdds.Add(7, new int[] { 10, 30, 44, 15, 1 });
+        shopOdds.Add(8, new int[] { 5, 15, 50, 25, 5 });
+        shopOdds.Add(9, new int[] { 5, 15, 30, 35, 15 });
+        shopOdds.Add(10, new int[] { 0, 5, 30, 40, 25 });
+    }
 
     //-------------------------------------------UI helper game logic functions
     public bool LevelUp()
@@ -89,6 +110,7 @@ public class GameController : MonoBehaviour
             if (xp >= xpForNextLevel[level - 1])
             {
                 player.AddSkillPoints(1);
+                teamSize++;
                 level++;
                 xp = xp - xpForNextLevel[level - 2];
             }
@@ -239,9 +261,9 @@ public class GameController : MonoBehaviour
     {
         GameObject[] onBoardAllies = GameObject.FindGameObjectsWithTag("Ally");
 
-        if (onBoardAllies.Length == level) return;
+        if (onBoardAllies.Length == teamSize) return;
 
-        int unitsMissing = level - onBoardAllies.Length;
+        int unitsMissing = teamSize - onBoardAllies.Length;
 
         GameObject[] onBenchAllies = GameObject.FindGameObjectsWithTag("OnBench");
         if (onBenchAllies.Length == 0) return;
@@ -386,8 +408,6 @@ public class GameController : MonoBehaviour
     }
 
 
-
-
     //TODO rework
     //Checks the currently active traits
     public Dictionary<string, int> CheckTraits()
@@ -529,6 +549,8 @@ public class GameController : MonoBehaviour
 
     public int GetNextIncome()
     {
+        int interest = gold > 50 ? (int)Mathf.Floor((gold - (gold - 50)) / 10) : (int)Mathf.Floor(gold / 10);
+        nextIncome = Mathf.Abs(player.GetStreak()) < 6 ? 5 + interest + fightStreakGold[Mathf.Abs(player.GetStreak())] : 5 + interest + fightStreakGold[Mathf.Abs(player.GetStreak() - (player.GetStreak() - 5))];
         return nextIncome;
     }
 
@@ -543,6 +565,21 @@ public class GameController : MonoBehaviour
         }
 
         return sprites;
+    }
+
+    public int GetTeamSize()
+    {
+        return teamSize;
+    }
+
+    public void AddTeamSize(int amount)
+    {
+        teamSize += amount;
+    }
+
+    public int [] GetShopOdds()
+    {
+        return shopOdds[level];
     }
 }
 

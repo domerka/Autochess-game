@@ -28,9 +28,11 @@ public class UIController : MonoBehaviour
     private RefreshShop refreshShop;
     public ShopInstantiator shopInstantiator;
     private PlayerInformationPanel playerInformationPanel;
+    private TextMeshProUGUI teamSizeText;
     private PlayerController player;
     private GameObject garbageLeft;
     private GameObject garbageRight;
+    private ShopOdds shopOdds;
 
     public GameObject settingsPanel;
 
@@ -52,6 +54,8 @@ public class UIController : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("PlayerController").GetComponent<PlayerController>();
         garbageLeft = transform.FindDeepChild("GarbageLeft").gameObject;
         garbageRight = transform.FindDeepChild("GarbageRight").gameObject;
+        shopOdds = transform.FindDeepChild("ShopOdds").gameObject.GetComponent<ShopOdds>();
+        teamSizeText = transform.FindDeepChild("TeamSizeText").gameObject.GetComponent<TextMeshProUGUI>();
         panelOpen = 0;
     }
 
@@ -86,6 +90,10 @@ public class UIController : MonoBehaviour
 
         //Skill points
         skillTree.GetComponent<SkillTreeAbilityController>().SetText();
+
+        shopOdds.UpdateUI(gameController.GetShopOdds());
+
+        UpdateTeamSizeUI();
     }
 
     //Called on //character buying//level upping//refreshing shop// 
@@ -138,6 +146,11 @@ public class UIController : MonoBehaviour
             UpdateUIOnLevelUp();
             UpdateUIOnGoldSpent();
         }
+    }
+
+    public void UpdateTeamSizeUI()
+    {
+        teamSizeText.text = gameController.GetNumberOfChampionsOnBoard() + "/" + gameController.GetTeamSize();
     }
     
 

@@ -26,32 +26,15 @@ public class DragObject : MonoBehaviour
         camera1 = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
     }
-    /*
-    public void ShowBoardAnBench(bool show)
-    {
-        GameObject grid = GameObject.FindGameObjectWithTag("Grid");
-        for (int i = 0; i < 7; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                GameObject tile = grid.transform.Find(i.ToString() + j.ToString()).gameObject;
-                //Bottom half of the board
-                if (tile.name[1] - '0' > 3 && !gameController.GetFightIsOn()) tile.GetComponent<Renderer>().enabled = show;
-                //Bench
-                if (i + j < 9) grid.transform.Find((i + j).ToString()).gameObject.GetComponent<Renderer>().enabled = show;
-            }
-        }
-    }*/
 
     private void OnMouseDown()
     {
         if (!character.draggable) return;
 
         //Showing the board and bench
-        
+        ShowBoardAndBench.Show(true, gameController.GetFightIsOn());
         //Saving the startile for swapping
         startTile = character.standingTile;
-        ShowBoardAndBench.Show(true, gameController.GetFightIsOn());
         screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
         offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
 
@@ -73,8 +56,6 @@ public class DragObject : MonoBehaviour
             Destroy(transform.gameObject);
             return;
         }
-
-        
 
 
         uiController.HideGarbage();
@@ -121,7 +102,7 @@ public class DragObject : MonoBehaviour
         //Hit the board
         else if(hitTile.tag == "Free")
         {
-            if ((gameController.GetLevel() > gameController.GetNumberOfChampionsOnBoard()) || (gameController.GetLevel() == gameController.GetNumberOfChampionsOnBoard() && character.tag == "Ally"))
+            if ((gameController.GetTeamSize() > gameController.GetNumberOfChampionsOnBoard()) || (gameController.GetTeamSize() == gameController.GetNumberOfChampionsOnBoard() && character.tag == "Ally"))
             {
                 character.tag = hitTile.name.Length < 2 ? "OnBench" : "Ally";
                 hitTile.tag = "OccupiedByAlly";
