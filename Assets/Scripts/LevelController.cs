@@ -37,7 +37,7 @@ public class LevelController : MonoBehaviour
         numOfStages = 5;
         stageCounter = -1;
 
-        preparationStageLength = 15.0f;
+        preparationStageLength = 5.0f;
         fightLength = 15.0f;
         overTimeLength = 10.0f;
         loadingStageLength = 2.0f;

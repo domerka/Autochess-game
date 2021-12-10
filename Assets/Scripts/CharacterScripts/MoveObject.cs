@@ -29,20 +29,23 @@ public class MoveObject : MonoBehaviour
     private float stunCurrent;
     private float stunDuration;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         gridList = new List<GameObject>();
+        stunCurrent = 0.0f;
+        rotationSpeed = 10.0f;
+    }
+
+    void Start()
+    {
         anim = GetComponent<Animator>();
         character = gameObject.GetComponent<CharacterController>();
         gameController = GameObject.FindGameObjectWithTag("GameControl").GetComponent<GameController>();
         nextAttack = character.attackSpeed;
         standingTile = character.standingTile;
-        stunCurrent = 0.0f;
-        rotationSpeed = 10.0f;
+        FindGrid();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(Time.time > stunCurrent && character.stunned)
@@ -56,23 +59,7 @@ public class MoveObject : MonoBehaviour
         }
 
         if (character.stunned) return;
-        //Find the grid
-        if (grid == null)
-        {
-            grid = GameObject.FindGameObjectWithTag("Grid");
-            for (int i = 0; i < 7; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    GameObject tile = grid.transform.Find(i.ToString() + j.ToString()).gameObject;
-                    gridList.Add(tile);
-                }
-            }
-            CalculateTileNeighbours();
-        }
-
-
-            //Starting the fight
+        //Starting the fight
         if (gameController.GetFightIsOn() && move == false)
         {
             standingTile = character.standingTile;
@@ -132,14 +119,8 @@ public class MoveObject : MonoBehaviour
         }
 
     }
-    //TODO
-    private void CastAbility()
-    {
-        character.SetMana(0);
-        AbilityController.CastAbility(character.name);
-    }
 
-    //Makes the character autoattack
+    //-----------------------Character behaviour functions
     private void AutoAttack()
     {
         //animation trigger
@@ -154,34 +135,17 @@ public class MoveObject : MonoBehaviour
         gameObject.transform.rotation = Quaternion.LookRotation(newDir);
 
         gameController.UpdateDamageDealt(character);
-        
+
         //Projectile shooting
         if (character.isRanged())
         {
-            if(Time.time > nextAttack)
+            if (Time.time > nextAttack)
             {
                 ShootProjectile();
                 nextAttack = Time.time + attackInterval;
             }
         }
     }
-
-    //Shoot projectile
-    private void ShootProjectile()
-    {
-        GameObject prefab;
-        GameObject inst;
-        switch (character.projectileName)
-        {
-            case ("arrow"):
-                prefab = Resources.Load("Prefabs/" + character.projectileName) as GameObject;
-                inst = Instantiate(prefab, character.standingTile.transform.position, Quaternion.identity);
-                inst.GetComponent<Projectile>().SetValues(target, this, 10.0f);
-                inst.tag = "Projectile";
-                break;
-        }
-    }
-
     public void InflictDamage()
     {
         float damage = character.attackDamage;
@@ -199,15 +163,6 @@ public class MoveObject : MonoBehaviour
             //blocked
         }
     }
-
-
-    //Turn it into an individual class
-    private void CreateDamagePopUp(float damage)
-    {
-        Instantiate(Resources.Load("Prefabs/DamagePopUp") as GameObject, target.transform.position, Quaternion.identity).GetComponent<DamagePopUp>().SetStyle(damage);
-    }
-
-    //Makes the character run
     private void Run()
     {
         character.standingTile.tag = "Free";
@@ -216,7 +171,7 @@ public class MoveObject : MonoBehaviour
         if (character.type == "Enemy") tileToMoveTo.tag = "OccupiedByEnemy";
         anim.SetBool("inRange", false);
         anim.SetTrigger("Run");
-        
+
         float singleStep = rotationSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(gameObject.transform.forward, tileToMoveTo.transform.position - gameObject.transform.position, singleStep, 0.0f);
         gameObject.transform.rotation = Quaternion.LookRotation(newDir);
@@ -228,42 +183,28 @@ public class MoveObject : MonoBehaviour
         tileToMoveTo.GetComponent<Tile>().isObstacle = true;
     }
 
-    //Tells whether the target is in attack range or not
-    private bool InRange(GameObject enemy)
+
+    //TODO
+    private void CastAbility()
     {
-        GameObject enemyTile = enemy.GetComponent<CharacterController>().standingTile;
-        
-        //Remaking the coordinate system for allied tile
-        int allyColumn = character.standingTile.name[0] - '0';
-        int allyRow = character.standingTile.name[1] - '0';
-
-        var xAlly = allyColumn - (allyRow - (allyRow & 1)) / 2;
-        var zAlly = allyRow;
-        var yAlly = -xAlly - zAlly;
-
-        //Remaking the coordinate system for enemy tile
-        int colEnemy = enemyTile.name[0] - '0';
-        int rowEnemy = enemyTile.name[1] - '0';
-
-        var xEnemy = colEnemy - (rowEnemy - (rowEnemy & 1)) / 2;
-        var zEnemy = rowEnemy;
-        var yEnemy = -xEnemy - zEnemy;
-
-        //Calculating the distance between them
-        int range = (Mathf.Abs(xAlly - xEnemy) + Mathf.Abs(yAlly - yEnemy) + Mathf.Abs(zAlly - zEnemy)) / 2;
-
-        if (range > character.attackRange) return false;
-        
-        return true;
-       
+        character.SetMana(0);
+        AbilityController.CastAbility(character.name);
     }
-    //Function to find the distance between two objects(used when looking for the closest enemy)
-    private float CalculateDistanceToEnemy(GameObject enemy)
+    private void ShootProjectile()
     {
-        return Mathf.Sqrt(Mathf.Pow(enemy.transform.position.x - character.standingTile.transform.position.x, 2) + Mathf.Pow(enemy.transform.position.z - character.standingTile.transform.position.z, 2));
+        GameObject prefab;
+        GameObject inst;
+        switch (character.projectileName)
+        {
+            case ("arrow"):
+                prefab = Resources.Load("Prefabs/" + character.projectileName) as GameObject;
+                inst = Instantiate(prefab, character.standingTile.transform.position, Quaternion.identity);
+                inst.GetComponent<Projectile>().SetValues(target, this, 10.0f);
+                inst.tag = "Projectile";
+                break;
+        }
     }
-
-    //Looks for the tile, which is a neighbour of the character and is the closest to the target
+    //-----------------------Path finding function
     private GameObject PathFinding(GameObject target)
     {
         //If the target is in range returns null (this trigerres the autoattack)
@@ -278,55 +219,18 @@ public class MoveObject : MonoBehaviour
         GameObject targetTile = neighbours[0];
         float distance = 200.0f;
 
-        foreach(GameObject go in neighbours)
+        foreach (GameObject go in neighbours)
         {
-            if(CalculateDistanceToEnemy(go) < distance && !go.GetComponent<Tile>().isObstacle)
+            if (CalculateDistanceToEnemy(go) < distance && !go.GetComponent<Tile>().isObstacle)
             {
                 targetTile = go;
                 distance = CalculateDistanceToEnemy(go);
             }
         }
-        
+
         //Calculates the whole path
         List<Tile> path = AStarPathfinding.FindPath(gameObject.GetComponent<CharacterController>().standingTile.GetComponent<Tile>(), targetTile.GetComponent<Tile>());
 
-        /*
-        //For fun-------------------------------------------------------------------------------
-        List<GameObject> pathToHighlight = new List<GameObject>();
-        if(player.name == "Enemy: 0")
-        {
-            for (int i = 0; i < gridList.Count; i++)
-            {
-                for (int j = 0; j < path.Count; j++)
-                {
-                    if (gridList[i].GetComponent<Tile>().position == path[j].position)
-                    {
-                        gridList[i].GetComponent<Renderer>().enabled = true;
-                        gridList[i].GetComponent<Renderer>().material.color = Color.green;
-                        pathToHighlight.Add(gridList[i]);
-                    }
-                }
-            }
-
-            for (int i = 0; i < gridList.Count; i++)
-            {
-                bool found = false;
-                for (int j = 0; j < path.Count; j++)
-                {
-                    if (gridList[i].GetComponent<Tile>().position == path[j].position)
-                    {
-                        found = true;
-                    }
-                }
-                if (!found)
-                {
-                    gridList[i].GetComponent<Renderer>().enabled = false;
-                }
-            }
-        }
-        //For fun-------------------------------------------------------------------------------
-        */
-        
         //Returns the first element of the path as the tiletomoveto
         for (int i = 0; i < gridList.Count; i++)
         {
@@ -340,67 +244,58 @@ public class MoveObject : MonoBehaviour
         }
         return null;
     }
-
+    //-----------------------Tile/tile neighbour functions
     private void CalculateTileNeighbours()
     {
         List<Tile> reCalculatedTiles = new List<Tile>();
-        foreach(GameObject tile in gridList)
+        foreach (GameObject tile in gridList)
         {
             tile.GetComponent<Tile>().adjacentTiles = GetNeighbours(tile);
         }
     }
-
-    //Finds the distance between two vectors
-    private float h(Vector3 n, Vector3 end)
-    {
-        return Mathf.Sqrt(Mathf.Pow(n.x - end.x,2) + Mathf.Pow(n.z - end.z, 2));
-    }
-
-    //Finds the neighbouring tiles for 'n' tile
     private List<Tile> GetNeighbours(GameObject n)
     {
         int nColumn = n.name[0] - '0';
         int nRow = n.name[1] - '0';
         List<Tile> neighbours = new List<Tile>();
 
-        for(int i = 0; i < gridList.Count; i++)
+        for (int i = 0; i < gridList.Count; i++)
         {
             int column = gridList[i].name[0] - '0';
             int row = gridList[i].name[1] - '0';
             //Left tile
-            if ( column == nColumn -1 && row == nRow) neighbours.Add(gridList[i].GetComponent<Tile>());
+            if (column == nColumn - 1 && row == nRow) neighbours.Add(gridList[i].GetComponent<Tile>());
             //Right tile
-            if(column == nColumn + 1 && row == nRow) neighbours.Add(gridList[i].GetComponent<Tile>());
+            if (column == nColumn + 1 && row == nRow) neighbours.Add(gridList[i].GetComponent<Tile>());
 
-            if(nRow %2 == 0)
+            if (nRow % 2 == 0)
             {
                 if (column == nColumn && row == nRow + 1) neighbours.Add(gridList[i].GetComponent<Tile>());
-                
+
                 if (column == nColumn && row == nRow - 1) neighbours.Add(gridList[i].GetComponent<Tile>());
-                
+
                 if (column == nColumn - 1 && row == nRow - 1) neighbours.Add(gridList[i].GetComponent<Tile>());
-                
+
                 if (column == nColumn - 1 && row == nRow + 1) neighbours.Add(gridList[i].GetComponent<Tile>());
             }
 
             if (nRow % 2 == 1)
             {
                 //jobb alul
-                if (column == nColumn +1 && row == nRow + 1) neighbours.Add(gridList[i].GetComponent<Tile>());
-                
+                if (column == nColumn + 1 && row == nRow + 1) neighbours.Add(gridList[i].GetComponent<Tile>());
+
                 //jobb felul
-                if (column == nColumn +1 && row == nRow - 1) neighbours.Add(gridList[i].GetComponent<Tile>());
-                
+                if (column == nColumn + 1 && row == nRow - 1) neighbours.Add(gridList[i].GetComponent<Tile>());
+
                 //bal felul
                 if (column == nColumn && row == nRow - 1) neighbours.Add(gridList[i].GetComponent<Tile>());
-                
+
                 //bal alul
                 if (column == nColumn && row == nRow + 1) neighbours.Add(gridList[i].GetComponent<Tile>());
             }
         }
         return neighbours;
     }
-
     private List<GameObject> GetNeighboursGameObject(GameObject n)
     {
         int nColumn = n.name[0] - '0';
@@ -443,9 +338,40 @@ public class MoveObject : MonoBehaviour
         }
         return neighbours;
     }
+    //-----------------------Distance functions
+    private bool InRange(GameObject enemy)
+    {
+        GameObject enemyTile = enemy.GetComponent<CharacterController>().standingTile;
 
+        //Remaking the coordinate system for allied tile
+        int allyColumn = character.standingTile.name[0] - '0';
+        int allyRow = character.standingTile.name[1] - '0';
+
+        var xAlly = allyColumn - (allyRow - (allyRow & 1)) / 2;
+        var zAlly = allyRow;
+        var yAlly = -xAlly - zAlly;
+
+        //Remaking the coordinate system for enemy tile
+        int colEnemy = enemyTile.name[0] - '0';
+        int rowEnemy = enemyTile.name[1] - '0';
+
+        var xEnemy = colEnemy - (rowEnemy - (rowEnemy & 1)) / 2;
+        var zEnemy = rowEnemy;
+        var yEnemy = -xEnemy - zEnemy;
+
+        //Calculating the distance between them
+        int range = (Mathf.Abs(xAlly - xEnemy) + Mathf.Abs(yAlly - yEnemy) + Mathf.Abs(zAlly - zEnemy)) / 2;
+
+        if (range > character.attackRange) return false;
+
+        return true;
+
+    }
+    private float CalculateDistanceToEnemy(GameObject enemy)
+    {
+        return Mathf.Sqrt(Mathf.Pow(enemy.transform.position.x - character.standingTile.transform.position.x, 2) + Mathf.Pow(enemy.transform.position.z - character.standingTile.transform.position.z, 2));
+    }
     //---------------------------------Targeting functions
-
     public GameObject FindFarthestEnemy()
     {
         //Finding the enemy units for the allied unit
@@ -470,8 +396,6 @@ public class MoveObject : MonoBehaviour
         }
         return null;
     }
-
-    //Target finder (finds the closest enemy)
     private GameObject FindClosestEnemy()
     {
         //Finding the enemy units for the allied unit
@@ -496,5 +420,29 @@ public class MoveObject : MonoBehaviour
         }
         return null;
     }
+
+    //---------------------------------Initialize functions
+    private void FindGrid()
+    {
+        grid = GameObject.FindGameObjectWithTag("Grid");
+        for (int i = 0; i < 7; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                GameObject tile = grid.transform.Find(i.ToString() + j.ToString()).gameObject;
+                gridList.Add(tile);
+            }
+        }
+        CalculateTileNeighbours();
+    }
+
+
+
+    //TODO separate non MonoBehaviour class creation for fightPopUp infos
+    private void CreateDamagePopUp(float damage)
+    {
+        Instantiate(Resources.Load("Prefabs/DamagePopUp") as GameObject, target.transform.position, Quaternion.identity).GetComponent<DamagePopUp>().SetStyle(damage);
+    }
+    
 
 }

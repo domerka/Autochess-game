@@ -6,20 +6,14 @@ using UnityEngine;
 public class CharacterController : MonoBehaviour
 {
     public string characterName;
-    
-    public string type;//ally/enemy
-    
-    public string className;//boxer/archer
-    public int level = 1;//level 1-2-3
-    public int cost;//how much the whole unit costs
-    public string abilityDescription;
+    public string className;
     public string traitName;
-    public int startingMana;
-    public int maximumMana;
 
-    public float health = 100f;
+    public string type;
+
+    public float health;
     public int attackRange;
-    public float attackSpeed = 1.0f;
+    public float attackSpeed;
     public int armor;
     public int magicResist;
     public int magicDamage;
@@ -28,31 +22,31 @@ public class CharacterController : MonoBehaviour
 
     public float moveSpeed;
 
+    public int level = 1;
+    public int cost;
+    public string abilityDescription;
+    
     public float damageDealt;
     public int damageHealed;
-
-    public bool ranged;
-
-    public int upgradePoints;
-
-    public string projectileName;
-
-    public List<string> upgradedStats;
-
-    public int fightsPlayed;
-
-    public bool draggable;
-
-    public bool sellable;
-
-    public GameObject standingTile;
-
     public float baseHealing;
 
+    public bool draggable;
+    public bool sellable;
+    public bool ranged;
     public bool stunned;
+
+    public List<string> upgradedStats;
+    public int upgradePoints;
+    public int fightsPlayed;
+
+
+    public string projectileName;
+    public GameObject standingTile;
 
     private HealthBar healthBar;
     private ManaBar manaBar;
+    public int startingMana;
+    public int maximumMana;
 
     private void Awake()
     {

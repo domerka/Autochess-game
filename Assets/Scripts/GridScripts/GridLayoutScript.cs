@@ -16,11 +16,16 @@ public class GridLayoutScript : MonoBehaviour
 
     Vector3 startPos;
 
-    void Start()
+    private void Awake()
     {
         AddGap();
         CalcStartPos();
         CreateGrid();
+    }
+
+    void Start()
+    {
+        
     }
 
     void AddGap()

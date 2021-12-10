@@ -288,6 +288,7 @@ public class GameController : MonoBehaviour
                         onBenchAllies[i].tag = "Ally";
                         tile.tag = "OccupiedByAlly";
                         found = true;
+                        TeamCombinationDatabase.Instance.AddCharacter(onBenchAllies[i].GetComponent<CharacterController>());
                         break;
                     }
                 }
@@ -406,75 +407,28 @@ public class GameController : MonoBehaviour
         GameObject[] projectiles = GameObject.FindGameObjectsWithTag("Projectile");
         foreach (GameObject projectile in projectiles) Destroy(projectile);
     }
-
-
-    //TODO rework
-    //Checks the currently active traits
-    public Dictionary<string, int> CheckTraits()
+    //TODO
+    //-----------------------------------------Team combination functions
+    public void AddTeamCombinationBonuses()
     {
-        GameObject[] allies = GameObject.FindGameObjectsWithTag("Ally");
 
-        Dictionary<string, int> traitAndClassDict = new Dictionary<string, int>();
-        if (allies.Length > 0)
-        {
-            List<string> names = new List<string>();
-            names.Add(allies[0].GetComponent<CharacterController>().name);
-            List<string> traits = new List<string>();
-            traits.Add(allies[0].GetComponent<CharacterController>().traitName);
-            List<string> classes = new List<string>();
-            classes.Add(allies[0].GetComponent<CharacterController>().className);
-
-
-            //Here to rule out when two of the same units are on your board (they dont count twice towards traits)
-            foreach (GameObject unit in allies)
-            {
-                bool inNames = false;
-                foreach (string name in names)
-                {
-                    if (name == unit.GetComponent<CharacterController>().name)
-                    {
-                        inNames = true;
-                        break;
-                    }
-                }
-                if (!inNames)
-                {
-                    traits.Add(unit.GetComponent<CharacterController>().traitName);
-                    classes.Add(unit.GetComponent<CharacterController>().className);
-                    names.Add(unit.GetComponent<CharacterController>().name);
-                }
-            }
-
-
-            //Check how many of one trait are in there
-            traitAndClassDict.Add(traits[0], 0);
-            foreach (string trait in traits)
-            {
-                if (traitAndClassDict.ContainsKey(trait))
-                {
-                    traitAndClassDict[trait]++;
-                }
-                else
-                {
-                    traitAndClassDict.Add(trait, 1);
-                }
-            }
-
-            traitAndClassDict.Add(classes[0], 0);
-            foreach (string className in classes)
-            {
-                if (traitAndClassDict.ContainsKey(className))
-                {
-                    traitAndClassDict[className]++;
-                }
-                else
-                {
-                    traitAndClassDict.Add(className, 1);
-                }
-            }
-        }
-        return traitAndClassDict;
     }
+
+    //Important function
+    public List<Sprite> GetShopPictures()
+    {
+        List<Sprite> sprites = new List<Sprite>();
+        for (int i = 0; i < 5; i++)
+        {
+            Sprite spriteToAdd = (int)Random.Range(0, 2) == 0 ? Resources.Load<Sprite>("Images/archer") : Resources.Load<Sprite>("Images/boxer");
+
+            sprites.Add(spriteToAdd);
+        }
+
+        return sprites;
+    }
+
+
     //Makes a copy of the units on board before the fight starts
     T CopyComponent<T>(T original, GameObject destination) where T : Component
     {
@@ -552,19 +506,6 @@ public class GameController : MonoBehaviour
         int interest = gold > 50 ? (int)Mathf.Floor((gold - (gold - 50)) / 10) : (int)Mathf.Floor(gold / 10);
         nextIncome = Mathf.Abs(player.GetStreak()) < 6 ? 5 + interest + fightStreakGold[Mathf.Abs(player.GetStreak())] : 5 + interest + fightStreakGold[Mathf.Abs(player.GetStreak() - (player.GetStreak() - 5))];
         return nextIncome;
-    }
-
-    public List<Sprite> GetShopPictures()
-    {
-        List<Sprite> sprites = new List<Sprite>();
-        for(int i = 0; i< 5; i++)
-        {
-            Sprite spriteToAdd = (int)Random.Range(0, 2) == 0 ? Resources.Load<Sprite>("Images/archer") : Resources.Load<Sprite>("Images/boxer");
-
-            sprites.Add(spriteToAdd);
-        }
-
-        return sprites;
     }
 
     public int GetTeamSize()

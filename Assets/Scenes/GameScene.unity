@@ -2343,19 +2343,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 210669610}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1653936727}
-        m_TargetAssemblyTypeName: UIController, Assembly-CSharp
-        m_MethodName: OnShopPictureImageClicked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &210669610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2929,19 +2917,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 243700354}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1653936727}
-        m_TargetAssemblyTypeName: UIController, Assembly-CSharp
-        m_MethodName: OnShopPictureImageClicked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &243700354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8018,19 +7994,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1008372561}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1653936727}
-        m_TargetAssemblyTypeName: UIController, Assembly-CSharp
-        m_MethodName: OnShopPictureImageClicked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1008372561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11724,7 +11688,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ac144e434e1874bbeee4dfaa450b21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOver: 0
 --- !u!1 &1644588618
 GameObject:
   m_ObjectHideFlags: 0
@@ -12050,10 +12013,8 @@ MonoBehaviour:
   damagePanel: {fileID: 388565884}
   healPanel: {fileID: 1549151891}
   rightSideInfoPanel: {fileID: 1374856625}
-  timeForUpgrade: 0
   shopInstantiator: {fileID: 0}
   settingsPanel: {fileID: 383140932}
-  isOverGarbage: 0
 --- !u!114 &1653936728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12909,7 +12870,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ac144e434e1874bbeee4dfaa450b21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOver: 0
 --- !u!1 &1832908324
 GameObject:
   m_ObjectHideFlags: 0
@@ -13163,19 +13123,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1845524883}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1653936727}
-        m_TargetAssemblyTypeName: UIController, Assembly-CSharp
-        m_MethodName: OnShopPictureImageClicked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1845524883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14507,19 +14455,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2126957424}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1653936727}
-        m_TargetAssemblyTypeName: UIController, Assembly-CSharp
-        m_MethodName: OnShopPictureImageClicked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2126957424
 MonoBehaviour:
   m_ObjectHideFlags: 0

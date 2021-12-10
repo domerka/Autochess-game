@@ -7,7 +7,6 @@ using UnityEngine.EventSystems;
 public class Garbage : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     UIController uiController;
-    public bool isOver = false;
 
     private void Start()
     {
@@ -15,12 +14,12 @@ public class Garbage : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        uiController.isOverGarbage = true;
+        uiController.SetIsOverGarbage(true);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         print(false);
-        uiController.isOverGarbage = false;
+        uiController.SetIsOverGarbage(false);
     }
 }

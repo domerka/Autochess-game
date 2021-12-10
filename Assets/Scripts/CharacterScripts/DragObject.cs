@@ -8,15 +8,12 @@ public class DragObject : MonoBehaviour
 
     public GameObject hitTile;
 
-    RaycastHit[] hits;
+    private RaycastHit[] hits;
     private CharacterController character;
     private Vector3 screenPoint;
     private Vector3 offset;
     private GameController gameController;
     public Camera camera1;
-
-    public Vector3 tempPos;
-
     private UIController uiController;
 
     private void Start()
@@ -33,23 +30,23 @@ public class DragObject : MonoBehaviour
 
         //Showing the board and bench
         ShowBoardAndBench.Show(true, gameController.GetFightIsOn());
+        uiController.ShowGarbage(character.cost);
+
         //Saving the startile for swapping
         startTile = character.standingTile;
         screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
         offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
-
-        uiController.ShowGarbage(character.cost);
-
     }
 
     private void OnMouseUp()
     {
         if (!character.draggable) return;
 
-        if (uiController.isOverGarbage)
+        if (uiController.GetIsOverGarbage())
         {
+            if(character.tag == "Ally") TeamCombinationDatabase.Instance.RemoveCharacter(character);
             uiController.HideGarbage();
-            uiController.isOverGarbage = false;
+            uiController.SetIsOverGarbage(false);
             ShowBoardAndBench.Show(false, gameController.GetFightIsOn());
             gameController.AddGold(character.cost);
             character.standingTile.tag = character.tag == "Ally" ? "Free" : "FreeBench";
@@ -72,7 +69,6 @@ public class DragObject : MonoBehaviour
         //Swapping
         if(hitTile.tag == "OccupiedByAlly")
         {
-            //find the unit who occupies the hittile
             GameObject whoOccupies = null;
             GameObject[] allies = GameObject.FindGameObjectsWithTag("Ally");
             GameObject[] onBoard = GameObject.FindGameObjectsWithTag("OnBench");
@@ -90,11 +86,15 @@ public class DragObject : MonoBehaviour
 
             if((whoOccupies.tag == "OnBench") && whoOccupies.tag != character.tag)
             {
+                TeamCombinationDatabase.Instance.AddCharacter(whoOccupies.GetComponent<CharacterController>());
+                TeamCombinationDatabase.Instance.RemoveCharacter(character);
                 whoOccupies.tag = "Ally";
                 gameObject.tag = "OnBench";
             }
             else if((whoOccupies.tag == "Ally") && whoOccupies.tag != character.tag)
             {
+                TeamCombinationDatabase.Instance.AddCharacter(character);
+                TeamCombinationDatabase.Instance.RemoveCharacter(whoOccupies.GetComponent<CharacterController>());
                 whoOccupies.tag = "OnBench";
                 gameObject.tag = "Ally";
             }
@@ -108,6 +108,7 @@ public class DragObject : MonoBehaviour
                 hitTile.tag = "OccupiedByAlly";
                 transform.position = hitTile.transform.position;
                 character.standingTile = hitTile;
+                TeamCombinationDatabase.Instance.AddCharacter(character);
             }
             else
             {
@@ -120,6 +121,8 @@ public class DragObject : MonoBehaviour
         //Hit the bench
         else
         {
+            if(character.tag == "Ally") TeamCombinationDatabase.Instance.RemoveCharacter(character);
+            
             transform.position = hitTile.transform.position;
             character.standingTile = hitTile;
             hitTile.tag = "OccupiedByAlly";
@@ -130,9 +133,12 @@ public class DragObject : MonoBehaviour
         Destroy(Instantiate(Resources.Load("Particles/CharacterPlacingParticle"), character.transform.position,Quaternion.identity),0.5f);
 
 
-        if (!gameController.GetFightIsOn()) uiController.ShowTraits();
-        
-        
+        if (!gameController.GetFightIsOn()) 
+        { 
+            uiController.UpdateTeamCombinationsUI();
+            gameController.AddTeamCombinationBonuses();
+        }
+
     }
 
     private void OnMouseDrag()

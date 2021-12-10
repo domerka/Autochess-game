@@ -66,6 +66,7 @@ public class InputController : MonoBehaviour
             GameObject character = hit.transform.gameObject;
             if ((character.tag == "Ally" && character.GetComponent<CharacterController>().sellable) || character.tag == "OnBench")
             {
+                if(character.tag == "Ally") TeamCombinationDatabase.Instance.RemoveCharacter(character.GetComponent<CharacterController>());
                 character.GetComponent<CharacterController>().standingTile.tag = character.tag == "Ally" ? "Free" : "FreeBench";
                 gameController.AddGold(character.GetComponent<CharacterController>().cost);
                 Destroy(character);
