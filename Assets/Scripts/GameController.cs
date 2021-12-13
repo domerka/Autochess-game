@@ -9,15 +9,13 @@ public class GameController : MonoBehaviour
     //-------------------Basic variables
     private int level;
     private int gold;
-    private int teamSize;
-    [SerializeField]private bool fightIsOn;
-    private int xp;
-    private int numberOfChampionsOnBoard;
-    private int[] xpForNextLevel;
-
+    [SerializeField]private int teamSize;
     private int nextIncome;
-
-
+    private int xp;
+    [SerializeField]private bool fightIsOn;
+    private bool showBoard;
+    
+    private int[] xpForNextLevel;
     private string[] characterNames;
 
     private Dictionary<string, int> championPool;
@@ -35,6 +33,9 @@ public class GameController : MonoBehaviour
 
     private Dictionary<int, int[]> shopOdds;
 
+    [SerializeField] private List<GameObject> onBoardAllies;
+    [SerializeField] private List<GameObject> onBenchAllies;
+
     private void Awake()
     {
         spawnEnemyDictionary = new Dictionary<int, string[]>();
@@ -43,18 +44,21 @@ public class GameController : MonoBehaviour
         level = 1;
         gold = 33;
         teamSize = 1;
-        numberOfChampionsOnBoard = 0;
         nextIncome = 5;
+        showBoard = true;
         xp = 2;
 
         fightStreakGold = new int[6] { 0, 1, 1, 2, 3, 4 };
         xpForNextLevel = new int[] { 4, 16, 24, 36, 60, 84, 100, 120, 132, 140 };
         shopOdds = new Dictionary<int, int[]>();
         savedAlliesBeforeFight = new List<CharacterController>();
+        onBenchAllies = new List<GameObject>();
+        onBoardAllies = new List<GameObject>();
 
         CreateShopOdss();
         CreateCharacterPool();
         CreateSpawnEnemydictionary();
+        ChampionDatabase.LoadBatabases();
     }
 
     // Start is called before the first frame update
@@ -62,13 +66,6 @@ public class GameController : MonoBehaviour
     {
         uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
         player = GameObject.FindGameObjectWithTag("PlayerController").GetComponent<PlayerController>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        numberOfChampionsOnBoard = GameObject.FindGameObjectsWithTag("Ally").Length;
-        uiController.UpdateTeamSizeUI();
     }
 
     //-------------------------------------------Initialising functions
@@ -145,13 +142,18 @@ public class GameController : MonoBehaviour
     //------------------------------------------Preparation stage functions
     public void SetPreparationStage()
     {
-        //destroy all units
         DestroyAllUnits();
 
         ResetBoard();
 
-        //Add gold and Xp
-        gold += nextIncome;
+        AddXPAfterFight();
+
+        CalculateNextIncome();
+        
+        uiController.UpdateUI();
+    }
+    private void AddXPAfterFight()
+    {
         xp += 2;
         if (xp >= xpForNextLevel[level - 1])
         {
@@ -159,41 +161,13 @@ public class GameController : MonoBehaviour
             level++;
             xp = xp - xpForNextLevel[level - 2];
         }
-
+    }
+    private void CalculateNextIncome()
+    {
+        gold += nextIncome;
         int interest = gold > 50 ? (int)Mathf.Floor((gold - (gold - 50)) / 10) : (int)Mathf.Floor(gold / 10);
 
         nextIncome = Mathf.Abs(player.GetStreak()) < 6 ? 5 + interest + fightStreakGold[Mathf.Abs(player.GetStreak())] : 5 + interest + fightStreakGold[Mathf.Abs(player.GetStreak() - (player.GetStreak() - 5))];
-        uiController.UpdateUI();
-    }
-    public void SpawnEnemies(int formation)
-    {
-        GameObject _spawnPosition = null;
-
-        for (int i = 0; i < spawnEnemyDictionary[formation].Length; i++)
-        {
-            GameObject temp = GameObject.Find(spawnEnemyDictionary[formation][i]);
-            if (temp != null)
-            {
-                _spawnPosition = temp;
-                _spawnPosition.tag = "OccupiedByEnemy";
-                GameObject inst = Instantiate(_prefab, _spawnPosition.transform.position, Quaternion.identity);
-                inst.GetComponent<DragObject>().hitTile = _spawnPosition;
-                inst.tag = "Enemy";
-                inst.GetComponent<CharacterController>().type = "Enemy";
-                inst.GetComponent<CharacterController>().standingTile = _spawnPosition;
-                inst.GetComponent<CharacterController>().attackRange = 1;
-                inst.GetComponentInChildren<Renderer>().material.color = Color.red;
-                inst.name = "Enemy: " + i;
-                Destroy(inst.GetComponent<DragObject>());
-                inst.GetComponent<CharacterController>().health = 1100;
-                inst.GetComponent<CharacterController>().attackRange = 5;
-                AddHealthBarDetails(inst);
-            }
-            else
-            {
-                print("Tile to spawn on not found");
-            }
-        }
     }
     private void AddHealthBarDetails(GameObject character)
     {
@@ -217,15 +191,14 @@ public class GameController : MonoBehaviour
     }
     private void DestroyAllUnits()
     {
-        GameObject[] alliesToDestroy = GameObject.FindGameObjectsWithTag("Ally");
-        GameObject[] enemysToDestroy = GameObject.FindGameObjectsWithTag("Enemy");
-
-        foreach (GameObject unit in alliesToDestroy)
-        {
+        //Destroy allies
+        foreach (GameObject unit in onBoardAllies)
+        { 
             unit.GetComponent<CharacterController>().standingTile.tag = "Free";
             Destroy(unit);
         }
-        foreach (GameObject unit in enemysToDestroy)
+        //Destroy enemys
+        foreach (GameObject unit in GameObject.FindGameObjectsWithTag("Enemy"))
         {
             unit.GetComponent<CharacterController>().standingTile.tag = "Free";
             Destroy(unit);
@@ -233,44 +206,99 @@ public class GameController : MonoBehaviour
     }
     private void ResetBoard()
     {
-        foreach (CharacterController unit in savedAlliesBeforeFight)
+        //Reset Tile isObstacles
+        GameObject grid = GameObject.FindGameObjectWithTag("Grid");
+        for (int i = 0; i < 7; i++)
         {
-            uiController.shopInstantiator.BoardResetInstantiation(unit);
+            for (int j = 0; j < 8; j++)
+            {
+                GameObject tile = grid.transform.Find(i.ToString() + j.ToString()).gameObject;
+                tile.GetComponent<Tile>().isObstacle = false;
+            }
         }
-        //delete copies
-        GameObject[] copies = GameObject.FindGameObjectsWithTag("Copy");
-        foreach (GameObject unit in copies) Destroy(unit);
+        //Readd units to OG position
+        foreach (CharacterController unit in savedAlliesBeforeFight) BoardResetInstantiation(unit);
+        //Delete copies
+        foreach (GameObject unit in GameObject.FindGameObjectsWithTag("Copy")) Destroy(unit);
 
         savedAlliesBeforeFight.Clear();
+    }
+    public void BoardResetInstantiation(CharacterController toInst)
+    {
+        GameObject prefab = null;
+
+        string path = "Prefabs/" + toInst.className;
+        prefab = Resources.Load(path) as GameObject;
+
+        GameObject inst = Instantiate(prefab, toInst.standingTile.transform.position, Quaternion.identity);
+        inst.GetComponent<DragObject>().hitTile = toInst.standingTile;
+        inst.GetComponent<CharacterController>().standingTile = toInst.standingTile;
+        inst.tag = "Ally";
+
+        if (toInst.level == 2) toInst.transform.localScale *= Mathf.Pow(1.1f, toInst.level - 1);
+
+        inst.GetComponent<CharacterController>().SetValuesCharacter(toInst);
+        inst.name = inst.GetComponent<CharacterController>().characterName;
+
+        AddHealthBarDetails(inst);
+
+    }
+    public void SpawnEnemies(int formation)
+    {
+        GameObject _spawnPosition = null;
+
+        for (int i = 0; i < spawnEnemyDictionary[formation].Length; i++)
+        {
+            GameObject temp = GameObject.Find(spawnEnemyDictionary[formation][i]);
+            if (temp != null)
+            {
+                _spawnPosition = temp;
+                _spawnPosition.tag = "OccupiedByEnemy";
+                GameObject inst = Instantiate(_prefab, _spawnPosition.transform.position, Quaternion.identity);
+                inst.GetComponent<DragObject>().hitTile = _spawnPosition;
+                inst.tag = "Enemy";
+                inst.GetComponent<CharacterController>().type = "Enemy";
+                inst.GetComponent<CharacterController>().standingTile = _spawnPosition;
+                _spawnPosition.GetComponent<Tile>().isObstacle = true;
+                inst.GetComponent<CharacterController>().attackRange = 1;
+                inst.GetComponentInChildren<Renderer>().material.color = Color.red;
+                inst.name = "Enemy: " + i;
+                Destroy(inst.GetComponent<DragObject>());
+                inst.GetComponent<CharacterController>().health = 1100;
+                inst.GetComponent<CharacterController>().attackRange = 5;
+                AddHealthBarDetails(inst);
+            }
+            else
+            {
+                print("Tile to spawn on not found");
+            }
+        }
     }
 
     //------------------------------------------Fight preparation stage functions
     public void SetFightPreparationStage()
     {
-        GameObject[] onBoardAllies = GameObject.FindGameObjectsWithTag("Ally");
+        showBoard = false;
         foreach (GameObject unit in onBoardAllies)
         {
-            unit.GetComponent<CharacterController>().draggable = false;
+            unit.GetComponent<CharacterController>().putDown = true;
+            unit.GetComponent<DragObject>().enabled = false;
             unit.GetComponent<CharacterController>().sellable = false;
+            unit.GetComponent<CharacterController>().standingTile.GetComponent<Tile>().isObstacle = true;
         }
         PutInUnitsAutomatically();
-
-
+        ShowBoardAndBench.Show(false, showBoard);
     }
     private void PutInUnitsAutomatically()
     {
-        GameObject[] onBoardAllies = GameObject.FindGameObjectsWithTag("Ally");
+        if (onBenchAllies.Count == 0) return;
+        if (onBoardAllies.Count == teamSize) return;
 
-        if (onBoardAllies.Length == teamSize) return;
-
-        int unitsMissing = teamSize - onBoardAllies.Length;
-
-        GameObject[] onBenchAllies = GameObject.FindGameObjectsWithTag("OnBench");
-        if (onBenchAllies.Length == 0) return;
-
+        int unitsMissing = teamSize - onBoardAllies.Count;
+        int iterateNumber = Mathf.Max(onBenchAllies.Count, unitsMissing);
         GameObject grid = GameObject.FindGameObjectWithTag("Grid");
 
-        for (int i = 0; i < Mathf.Max(onBenchAllies.Length, unitsMissing); i++)
+        for (int i = 0; i < iterateNumber; i++)
         {
             for (int j = 7; j > 4; j--)
             {
@@ -280,15 +308,19 @@ public class GameController : MonoBehaviour
                     GameObject tile = grid.transform.Find(k.ToString() + j.ToString()).gameObject;
                     if (tile.tag == "Free")
                     {
-                        onBenchAllies[i].GetComponent<CharacterController>().standingTile.tag = "FreeBench";
-                        onBenchAllies[i].GetComponent<CharacterController>().standingTile = tile;
-                        onBenchAllies[i].GetComponent<CharacterController>().draggable = false;
-                        onBenchAllies[i].GetComponent<CharacterController>().sellable = false;
-                        onBenchAllies[i].transform.position = tile.transform.position;
-                        onBenchAllies[i].tag = "Ally";
+                        onBenchAllies[0].GetComponent<CharacterController>().standingTile.tag = "FreeBench";
+                        onBenchAllies[0].GetComponent<CharacterController>().standingTile = tile;
+                        onBenchAllies[0].GetComponent<CharacterController>().putDown = true;
+                        onBenchAllies[0].GetComponent<DragObject>().enabled = false;
+                        onBenchAllies[0].GetComponent<CharacterController>().sellable = false;
+                        onBenchAllies[0].transform.position = tile.transform.position;
+                        onBenchAllies[0].tag = "Ally";
                         tile.tag = "OccupiedByAlly";
+                        tile.GetComponent<Tile>().isObstacle = true;
                         found = true;
-                        TeamCombinationDatabase.Instance.AddCharacter(onBenchAllies[i].GetComponent<CharacterController>());
+                        TeamCombinationDatabase.Instance.AddCharacter(onBenchAllies[0].GetComponent<CharacterController>());
+                        AddCharacterOnBoard(onBenchAllies[0]);
+                        RemoveCharacterOnBench(onBenchAllies[0]);
                         break;
                     }
                 }
@@ -304,9 +336,8 @@ public class GameController : MonoBehaviour
         {
             for (int i = 1; i <= 2; i++)
             {
-                uiController.shopInstantiator.CombineUnits(name, i, false);
+                CombineUnits(name, i, false);
             }
-
         }
     }
 
@@ -316,34 +347,30 @@ public class GameController : MonoBehaviour
         GameObject[] onBoardAllies = GameObject.FindGameObjectsWithTag("Ally");
 
         SaveAlliesBeforFight(onBoardAllies);
-
-        foreach (GameObject ob in onBoardAllies)
-        {
-            ob.GetComponent<CharacterController>().draggable = ob.GetComponent<CharacterController>().draggable == true ? false : true;
-            ob.GetComponent<CharacterController>().sellable = false;
-        }
         uiController.CreateStatLayout(onBoardAllies, "Ally", "Damage");
         uiController.CreateStatLayout(GameObject.FindGameObjectsWithTag("Enemy"), "Enemy", "Damage");
         uiController.CreateStatLayout(onBoardAllies, "Ally", "Heal");
         uiController.CreateStatLayout(GameObject.FindGameObjectsWithTag("Enemy"), "Enemy", "Heal");
 
-        DestroyMoveObjectOnBench();
+        DisableMoveObjectOnBench();
         fightIsOn = true;
     }
-    private void DestroyMoveObjectOnBench()
+    private void DisableMoveObjectOnBench()
     {
         GameObject[] onBenchAllies = GameObject.FindGameObjectsWithTag("OnBench");
         foreach (GameObject unit in onBenchAllies)
         {
-            if (unit.GetComponent<MoveObject>() != null)
-                Destroy(unit.GetComponent<MoveObject>());
+            if (unit.GetComponent<MoveObject>().enabled)
+                unit.GetComponent<MoveObject>().enabled = false;
         }
     }
     private void SaveAlliesBeforFight(GameObject[] onBoardAllies)
     {
         foreach (GameObject unit in onBoardAllies)
         {
-            if (unit.GetComponent<MoveObject>() == null) unit.AddComponent<MoveObject>();
+            unit.GetComponent<MoveObject>().enabled = true;
+            unit.GetComponent<DragObject>().enabled = false;
+            unit.GetComponent<CharacterController>().sellable = false;
 
             GameObject copyGameObject = new GameObject("Copy");
             copyGameObject.tag = "Copy";
@@ -366,25 +393,39 @@ public class GameController : MonoBehaviour
     //------------------------------------------End of the fight stage functions
     public void SetEndFightStage()
     {
-
         fightIsOn = false;
-
+        showBoard = true;
         DestroyProjectiles();
 
-
         GameObject[] onBoardAllies = GameObject.FindGameObjectsWithTag("Ally");
+        GameObject[] survivedEnemys = GameObject.FindGameObjectsWithTag("Enemy");
+
+        if (survivedEnemys != null) player.TakeDamage(survivedEnemys.Length);
+
+        PrepareOnBoardAllies(onBoardAllies);
+        CalculateFightStreak(onBoardAllies, survivedEnemys);
+        
+    }
+    private void DestroyProjectiles()
+    {
+        GameObject[] projectiles = GameObject.FindGameObjectsWithTag("Projectile");
+        foreach (GameObject projectile in projectiles) Destroy(projectile);
+    }
+    private void PrepareOnBoardAllies(GameObject[] onBoardAllies)
+    {
         foreach (GameObject ob in onBoardAllies)
         {
-            ob.GetComponent<CharacterController>().draggable = ob.GetComponent<CharacterController>().draggable == true ? false : true;
+            ob.GetComponent<DragObject>().enabled = true;
             ob.GetComponent<CharacterController>().sellable = true;
+            ob.GetComponent<CharacterController>().putDown = false;
             ob.GetComponent<CharacterController>().fightsPlayed++;
             if (ob.GetComponent<CharacterController>().fightsPlayed == 3) ob.GetComponent<CharacterController>().AddUpgradePoint();
             ob.GetComponent<CharacterController>().damageDealt = 0;
         }
 
-        GameObject[] survivedEnemys = GameObject.FindGameObjectsWithTag("Enemy");
-        if (survivedEnemys != null) player.TakeDamage(survivedEnemys.Length);
-
+    }
+    private void CalculateFightStreak(GameObject[] onBoardAllies, GameObject[] survivedEnemys)
+    {
         if (onBoardAllies.Length > survivedEnemys.Length)
         {
             if (player.GetStreak() < 0) player.SetStreak(1);
@@ -395,18 +436,117 @@ public class GameController : MonoBehaviour
             if (player.GetStreak() > 0) player.SetStreak(-1);
             else player.AddStreak(-1);
         }
-
-
-        //Readding the MoveObject script for units on the bench
-        GameObject[] onBenchAllies = GameObject.FindGameObjectsWithTag("OnBench");
-
-        foreach (GameObject unit in onBenchAllies) unit.AddComponent<MoveObject>();
     }
-    private void DestroyProjectiles()
+    //-----------------------------------------Database functions
+    public void OnShopImageClicked(Sprite button)
     {
-        GameObject[] projectiles = GameObject.FindGameObjectsWithTag("Projectile");
-        foreach (GameObject projectile in projectiles) Destroy(projectile);
+        CharacterController character = ChampionDatabase.GetDatabaseCharacterController(1,button.name);
+
+        uiController.BuyCharacter(character.cost);
+
+        GameObject prefab;
+        prefab = Resources.Load("Prefabs/" + button.name) as GameObject;
+        
+        GameObject[] bench = ResetBench();
+        
+        if (bench[0] != null)
+        {
+            bench[0].tag = "OccupiedByAlly";
+            GameObject inst = Instantiate(prefab, bench[0].transform.position, Quaternion.identity);
+            inst.GetComponent<DragObject>().hitTile = bench[0];
+            inst.tag = "OnBench";
+        
+            inst.GetComponent<CharacterController>().SetValuesCharacter(character);
+        
+            inst.GetComponent<CharacterController>().standingTile = bench[0];
+        
+            inst.name = inst.GetComponent<CharacterController>().characterName;
+        
+            AddHealthBarDetails(inst);
+        
+            inst.GetComponent<MoveObject>().enabled = false;
+        
+            CombineUnits(button.name, 1, uiController.GetFightIsOn());
+
+            onBenchAllies.Add(inst);
+        }
+        else
+        {
+            //TODO bench is full message
+        }
+        
     }
+    private void CombineUnits(string name, int level, bool fightIsOn)
+    {
+        GameObject[] onBenchAllies = GameObject.FindGameObjectsWithTag("OnBench");
+        List<GameObject> foundUnits = new List<GameObject>();
+
+        if (!fightIsOn)
+        {
+            GameObject[] allies = GameObject.FindGameObjectsWithTag("Ally");
+            for (int i = 0; i < allies.Length; i++)
+            {
+                if (allies[i].GetComponent<CharacterController>().characterName == name && allies[i].GetComponent<CharacterController>().level == level)
+                    foundUnits.Add(allies[i]);
+            }
+        }
+
+        for (int i = 0; i < onBenchAllies.Length; i++)
+        {
+            if (onBenchAllies[i].GetComponent<CharacterController>().characterName == name && onBenchAllies[i].GetComponent<CharacterController>().level == level)
+                foundUnits.Add(onBenchAllies[i]);
+        }
+        if (foundUnits.Count >= 3)
+        {
+            for (int i = 1; i < 3; i++)
+            {
+                foundUnits[i].GetComponent<CharacterController>().standingTile.tag = foundUnits[i].GetComponent<CharacterController>().tag == "OnBench" ? "FreeBench" : "Free";
+
+                if (foundUnits[i].GetComponent<CharacterController>().tag == "OnBench") RemoveCharacterOnBench(foundUnits[i]);
+                else RemoveCharacterOnBoard(foundUnits[i]);
+
+                Destroy(foundUnits[i]);
+            }
+            foundUnits[0].gameObject.transform.localScale *= 1.1f;
+            GameObject tileToSet = foundUnits[0].GetComponent<CharacterController>().standingTile;
+
+            foundUnits[0].GetComponent<CharacterController>().SetValuesCharacter(ChampionDatabase.GetDatabaseCharacterController(++level,name));
+
+            foundUnits[0].GetComponent<CharacterController>().standingTile = tileToSet;
+
+            foundUnits[0].GetComponent<CharacterController>().level += 1;
+
+            AddHealthBarDetails(foundUnits[0]);
+
+            CombineUnits(name, level, fightIsOn);
+        }
+    }
+    //Bench manipulation
+    private GameObject[] ResetBench()
+    {
+        GameObject[] bench = GameObject.FindGameObjectsWithTag("FreeBench");
+        List<GameObject> forSort = new List<GameObject>();
+
+        for (int i = 0; i < bench.Length; i++)
+        {
+            forSort.Add(bench[i]);
+        }
+
+        forSort.Sort(SortByName);
+
+        for (int i = 0; i < bench.Length; i++)
+        {
+            bench[i] = forSort[i];
+        }
+
+        return bench;
+    }
+    static int SortByName(GameObject o1, GameObject o2)
+    {
+        return int.Parse(o1.name).CompareTo(int.Parse(o2.name));
+    }
+    
+
     //TODO
     //-----------------------------------------Team combination functions
     public void AddTeamCombinationBonuses()
@@ -415,17 +555,21 @@ public class GameController : MonoBehaviour
     }
 
     //Important function
-    public List<Sprite> GetShopPictures()
+    public Dictionary<List<Sprite>, List<int>> GetShopPictures()
     {
+        Dictionary<List<Sprite>, List<int>> shopPictureInfos = new Dictionary<List<Sprite>, List<int>>();
         List<Sprite> sprites = new List<Sprite>();
+        List<int> costs = new List<int>();
         for (int i = 0; i < 5; i++)
         {
             Sprite spriteToAdd = (int)Random.Range(0, 2) == 0 ? Resources.Load<Sprite>("Images/archer") : Resources.Load<Sprite>("Images/boxer");
-
+            costs.Add(1);
             sprites.Add(spriteToAdd);
         }
 
-        return sprites;
+        shopPictureInfos.Add(sprites, costs);
+
+        return shopPictureInfos;
     }
 
 
@@ -446,10 +590,9 @@ public class GameController : MonoBehaviour
     //Getter - setter functions------------------------------
     public bool CheckWhetherFightIsOver()
     {
-        GameObject[] allies = GameObject.FindGameObjectsWithTag("Ally");
         GameObject[] enemys = GameObject.FindGameObjectsWithTag("Enemy");
 
-        if (allies.Length == 0) return true;
+        if (onBoardAllies.Count == 0) return true;
         if (enemys.Length == 0) return true;
         return false;
     }
@@ -481,7 +624,7 @@ public class GameController : MonoBehaviour
 
     public int GetNumberOfChampionsOnBoard()
     {
-        return numberOfChampionsOnBoard;
+        return onBoardAllies.Count;
     }
 
     public void AddGold(int amount)
@@ -522,5 +665,34 @@ public class GameController : MonoBehaviour
     {
         return shopOdds[level];
     }
+
+    public bool GetShowBoard()
+    {
+        return showBoard;
+    }
+
+    public void AddCharacterOnBoard(GameObject character)
+    {
+        onBoardAllies.Add(character);
+        uiController.UpdateTeamSizeUI();
+    }
+    public void AddCharacterOnBench(GameObject character)
+    {
+        onBenchAllies.Add(character);
+        uiController.UpdateTeamSizeUI();
+    }
+    public void RemoveCharacterOnBoard(GameObject character)
+    {
+        onBoardAllies.Remove(character);
+        uiController.UpdateTeamSizeUI();
+    }
+    public void RemoveCharacterOnBench(GameObject character)
+    {
+        onBenchAllies.Remove(character);
+        uiController.UpdateTeamSizeUI();
+    }
+
+
+
 }
 

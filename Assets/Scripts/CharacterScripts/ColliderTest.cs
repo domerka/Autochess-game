@@ -6,6 +6,7 @@ public class ColliderTest : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
+        if (other == null) return;
         if (GameObject.FindGameObjectWithTag("GameControl").GetComponent<GameController>().GetFightIsOn())
         {
             if (other.gameObject.tag == "Enemy" && other.gameObject.name == this.gameObject.transform.root.GetComponent<MoveObject>().target.name)

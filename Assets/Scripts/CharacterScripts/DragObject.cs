@@ -13,23 +13,20 @@ public class DragObject : MonoBehaviour
     private Vector3 screenPoint;
     private Vector3 offset;
     private GameController gameController;
-    public Camera camera1;
     private UIController uiController;
 
     private void Start()
     {
         character = gameObject.GetComponent<CharacterController>();
         gameController = GameObject.FindGameObjectWithTag("GameControl").GetComponent<GameController>();
-        camera1 = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
     }
 
     private void OnMouseDown()
     {
-        if (!character.draggable) return;
-
+        if (character.putDown) return;
         //Showing the board and bench
-        ShowBoardAndBench.Show(true, gameController.GetFightIsOn());
+        ShowBoardAndBench.Show(true, gameController.GetShowBoard());
         uiController.ShowGarbage(character.cost);
 
         //Saving the startile for swapping
@@ -40,14 +37,24 @@ public class DragObject : MonoBehaviour
 
     private void OnMouseUp()
     {
-        if (!character.draggable) return;
+        //PutInUnitsAutomatically
+        if (character.putDown) return;
+        
 
         if (uiController.GetIsOverGarbage())
         {
-            if(character.tag == "Ally") TeamCombinationDatabase.Instance.RemoveCharacter(character);
+            if(character.tag == "Ally")
+            {
+                gameController.RemoveCharacterOnBoard(gameObject);
+                TeamCombinationDatabase.Instance.RemoveCharacter(character);
+            }
+            else
+            {
+                gameController.RemoveCharacterOnBench(gameObject);
+            }
             uiController.HideGarbage();
             uiController.SetIsOverGarbage(false);
-            ShowBoardAndBench.Show(false, gameController.GetFightIsOn());
+            ShowBoardAndBench.Show(false, gameController.GetShowBoard());
             gameController.AddGold(character.cost);
             character.standingTile.tag = character.tag == "Ally" ? "Free" : "FreeBench";
             Destroy(transform.gameObject);
@@ -56,7 +63,7 @@ public class DragObject : MonoBehaviour
 
 
         uiController.HideGarbage();
-        ShowBoardAndBench.Show(false, gameController.GetFightIsOn());
+        ShowBoardAndBench.Show(false, gameController.GetShowBoard());
 
         hitTile.transform.GetComponent<MeshRenderer>().material.SetVector("_BaseColor", new Vector4(0f, 0.611f, 0.725f, 255));
         hitTile.transform.GetComponent<MeshRenderer>().material.SetVector("_Transparency", new Vector4(0.3f, 0, 0, 0));
@@ -88,6 +95,10 @@ public class DragObject : MonoBehaviour
             {
                 TeamCombinationDatabase.Instance.AddCharacter(whoOccupies.GetComponent<CharacterController>());
                 TeamCombinationDatabase.Instance.RemoveCharacter(character);
+                gameController.AddCharacterOnBoard(whoOccupies);
+                gameController.RemoveCharacterOnBoard(gameObject);
+                gameController.AddCharacterOnBench(gameObject);
+                gameController.RemoveCharacterOnBench(whoOccupies);
                 whoOccupies.tag = "Ally";
                 gameObject.tag = "OnBench";
             }
@@ -95,6 +106,10 @@ public class DragObject : MonoBehaviour
             {
                 TeamCombinationDatabase.Instance.AddCharacter(character);
                 TeamCombinationDatabase.Instance.RemoveCharacter(whoOccupies.GetComponent<CharacterController>());
+                gameController.AddCharacterOnBoard(gameObject);
+                gameController.RemoveCharacterOnBoard(whoOccupies);
+                gameController.AddCharacterOnBench(whoOccupies);
+                gameController.RemoveCharacterOnBench(gameObject);
                 whoOccupies.tag = "OnBench";
                 gameObject.tag = "Ally";
             }
@@ -109,6 +124,8 @@ public class DragObject : MonoBehaviour
                 transform.position = hitTile.transform.position;
                 character.standingTile = hitTile;
                 TeamCombinationDatabase.Instance.AddCharacter(character);
+                gameController.AddCharacterOnBoard(gameObject);
+                gameController.RemoveCharacterOnBench(gameObject);
             }
             else
             {
@@ -121,8 +138,12 @@ public class DragObject : MonoBehaviour
         //Hit the bench
         else
         {
-            if(character.tag == "Ally") TeamCombinationDatabase.Instance.RemoveCharacter(character);
-            
+            if (character.tag == "Ally") 
+            {
+                TeamCombinationDatabase.Instance.RemoveCharacter(character);
+                gameController.RemoveCharacterOnBoard(gameObject);
+                gameController.AddCharacterOnBench(gameObject);
+            }
             transform.position = hitTile.transform.position;
             character.standingTile = hitTile;
             hitTile.tag = "OccupiedByAlly";
@@ -143,9 +164,16 @@ public class DragObject : MonoBehaviour
 
     private void OnMouseDrag()
     {
-        if (!character.draggable) return;
+        if (character.putDown)
+        {
+            hitTile = character.standingTile;
+            gameObject.transform.position = hitTile.transform.position;
+            hitTile.transform.GetComponent<MeshRenderer>().material.SetVector("_BaseColor", new Vector4(0f, 0.611f, 0.725f, 255));
+            hitTile.transform.GetComponent<MeshRenderer>().material.SetVector("_Transparency", new Vector4(0.3f, 0, 0, 0));
+            return;
+        }
 
-        hits = Physics.RaycastAll(camera1.ScreenPointToRay(Input.mousePosition), 100.0f);
+        hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition), 100.0f);
         
         for (int i = 0; i < hits.Length; i++)
         {
@@ -188,8 +216,4 @@ public class DragObject : MonoBehaviour
         cursorPosition.y = 0.0f;
         transform.position = cursorPosition;
     }
-
-
-    
-
 }

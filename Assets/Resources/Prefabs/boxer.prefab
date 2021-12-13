@@ -550,8 +550,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startTile: {fileID: 0}
   hitTile: {fileID: 0}
-  camera1: {fileID: 0}
-  tempPos: {x: 0, y: 0, z: 0}
 --- !u!114 &6673370823770862611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -565,7 +563,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   standingTile: {fileID: 0}
-  runningSpeed: 1
   rotationSpeed: 100
   target: {fileID: 0}
 --- !u!114 &1263887486238791846
@@ -580,8 +577,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3ca3ce0339b6ea4e80c00a99643c292, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentHealth: 0
-  slider: {fileID: 0}
 --- !u!114 &3030301310457159030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -595,14 +590,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: 
-  type: 
   className: 
-  level: 0
-  cost: 0
-  abilityDescription: 
   traitName: 
-  startingMana: 0
-  maximumMana: 0
+  type: 
   health: 100
   attackRange: 0
   attackSpeed: 1
@@ -611,16 +601,24 @@ MonoBehaviour:
   magicDamage: 0
   attackDamage: 0
   critChance: 0
+  moveSpeed: 0
+  level: 0
+  cost: 0
+  abilityDescription: 
   damageDealt: 0
   damageHealed: 0
-  ranged: 0
-  upgradePoints: 0
-  projectileName: 
-  upgradedStats: []
-  fightsPlayed: 0
-  draggable: 0
+  baseHealing: 0
   sellable: 0
+  ranged: 0
+  stunned: 0
+  upgradedStats: []
+  upgradePoints: 0
+  fightsPlayed: 0
+  projectileName: 
   standingTile: {fileID: 0}
+  startingMana: 0
+  maximumMana: 0
+  putDown: 0
 --- !u!114 &7279758078454291049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -633,7 +631,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f30c3d5ad63fdb14ca0abc1619924909, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentMana: 0
   slider: {fileID: 0}
 --- !u!114 &-6958306325615844102
 MonoBehaviour:

@@ -183,7 +183,6 @@ public class MoveObject : MonoBehaviour
         tileToMoveTo.GetComponent<Tile>().isObstacle = true;
     }
 
-
     //TODO
     private void CastAbility()
     {

@@ -30,7 +30,6 @@ public class CharacterController : MonoBehaviour
     public int damageHealed;
     public float baseHealing;
 
-    public bool draggable;
     public bool sellable;
     public bool ranged;
     public bool stunned;
@@ -48,10 +47,12 @@ public class CharacterController : MonoBehaviour
     public int startingMana;
     public int maximumMana;
 
+    public bool putDown;
+
     private void Awake()
     {
-        draggable = true;
         sellable = true;
+        putDown = false;
         upgradedStats = new List<string>();
         fightsPlayed = 0;
         baseHealing = 0;
@@ -82,7 +83,6 @@ public class CharacterController : MonoBehaviour
         cost = _cost;
         abilityDescription = _abilityDescription;
         traitName = _traitName;
-        draggable = true;
         maximumMana = _maxMana;
         startingMana = _startingMana;
         armor = _armor;
@@ -92,6 +92,7 @@ public class CharacterController : MonoBehaviour
         critChance = _critChance;
         ranged = _ranged;
         projectileName = _projectileName;
+        putDown = false;
     }
 
 
@@ -107,7 +108,6 @@ public class CharacterController : MonoBehaviour
         cost = character.cost;
         abilityDescription = character.abilityDescription;
         traitName = character.traitName;
-        draggable = true;
         maximumMana = character.maximumMana;
         startingMana = character.startingMana;
         armor = character.armor;

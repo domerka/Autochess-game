@@ -38,7 +38,7 @@ public class LevelController : MonoBehaviour
         stageCounter = -1;
 
         preparationStageLength = 5.0f;
-        fightLength = 15.0f;
+        fightLength = 30.0f;
         overTimeLength = 10.0f;
         loadingStageLength = 2.0f;
 
@@ -79,7 +79,7 @@ public class LevelController : MonoBehaviour
         if(currentTime <= 0 || (gameController.CheckWhetherFightIsOver() && gameController.GetFightIsOn()))
         {
             //Skip overtime stage if the fight ended in normal time
-            if (gameController.CheckWhetherFightIsOver() && gameController.GetFightIsOn() && !isOvertimeStage) stageCounter += 2;
+            if (gameController.CheckWhetherFightIsOver() && gameController.GetFightIsOn() && !isOvertimeStage) stageCounter++;
 
             stageCounter++;
             stageText.text = "Fight number: " + Mathf.CeilToInt((stageCounter / numOfStages));

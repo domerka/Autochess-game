@@ -40,6 +40,7 @@ public class UIController : MonoBehaviour
         enemyDamageDealt = new List<GameObject>();
         allyDamageHealed = new List<GameObject>();
         enemyDamageHealed = new List<GameObject>();
+
         osb = transform.FindDeepChild("OpponentStrengthBar").gameObject.GetComponent<OpponentStrengthBar>();
         levelUp = transform.FindDeepChild("LevelUp").gameObject.GetComponent<LevelUp>();
         refreshShop = transform.FindDeepChild("RefreshShop").gameObject.GetComponent<RefreshShop>();
@@ -326,7 +327,6 @@ public class UIController : MonoBehaviour
     //-----------------------------Helper functions
     private int CompareSort(GameObject p1, GameObject p2)
     {
-
         return p1.GetComponent<StoreValue>().value.CompareTo(p2.GetComponent<StoreValue>().value);
     }
     public bool GetFightIsOn()
