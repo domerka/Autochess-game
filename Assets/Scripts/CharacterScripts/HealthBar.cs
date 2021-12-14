@@ -60,6 +60,7 @@ public class HealthBar : MonoBehaviour
         {
             SetupAccessories();
             gameObject.GetComponent<CharacterController>().standingTile.tag = "Free";
+            gameObject.GetComponent<CharacterController>().standingTile.GetComponent<Tile>().isObstacle = false;
             deathTimerOffset = Time.time;
             deathAnimProgress = 0.0f;
             dead = true;

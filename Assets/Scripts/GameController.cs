@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 //github test change
 public class GameController : MonoBehaviour
@@ -14,9 +15,9 @@ public class GameController : MonoBehaviour
     private int xp;
     [SerializeField]private bool fightIsOn;
     private bool showBoard;
+    private bool fightPreparation;
     
     private int[] xpForNextLevel;
-    private string[] characterNames;
 
     private Dictionary<string, int> championPool;
     private Dictionary<int, string[]> spawnEnemyDictionary;
@@ -39,13 +40,13 @@ public class GameController : MonoBehaviour
     private void Awake()
     {
         spawnEnemyDictionary = new Dictionary<int, string[]>();
-        characterNames = new string[2] { "boxer", "archer" };
         
         level = 1;
         gold = 33;
         teamSize = 1;
         nextIncome = 5;
         showBoard = true;
+        fightPreparation = false;
         xp = 2;
 
         fightStreakGold = new int[6] { 0, 1, 1, 2, 3, 4 };
@@ -169,26 +170,6 @@ public class GameController : MonoBehaviour
 
         nextIncome = Mathf.Abs(player.GetStreak()) < 6 ? 5 + interest + fightStreakGold[Mathf.Abs(player.GetStreak())] : 5 + interest + fightStreakGold[Mathf.Abs(player.GetStreak() - (player.GetStreak() - 5))];
     }
-    private void AddHealthBarDetails(GameObject character)
-    {
-        CharacterController charControl = character.GetComponent<CharacterController>();
-        //if (charControl.type == "Enemy") return;
-        GameObject healthBar = character.transform.FindDeepChild("CharacterBars").gameObject;
-
-        int tickSize = 5;
-        float healthChunkSize = 250;
-
-        int numOfTicks = Mathf.FloorToInt((charControl.health - 1) / healthChunkSize);// this '-10' is because of the spacing 
-        float x = (healthBar.GetComponent<RectTransform>().rect.width - 10 - (tickSize * numOfTicks)) / (charControl.health / healthChunkSize);
-        float offset = tickSize / 2.0f;
-        for (int i = 1; i <= numOfTicks; i++)
-        {
-            GameObject inst = Instantiate(Resources.Load("Prefabs/Tick") as GameObject, new Vector3(0, 0, 0), Quaternion.identity, character.transform.FindDeepChild("HealthBar"));
-            inst.GetComponent<RectTransform>().localPosition = new Vector3(i * x + offset, 0.0f, 0.0f);
-            offset += tickSize;
-        }
-
-    }
     private void DestroyAllUnits()
     {
         //Destroy allies
@@ -203,6 +184,7 @@ public class GameController : MonoBehaviour
             unit.GetComponent<CharacterController>().standingTile.tag = "Free";
             Destroy(unit);
         }
+        onBoardAllies.Clear();
     }
     private void ResetBoard()
     {
@@ -229,18 +211,16 @@ public class GameController : MonoBehaviour
 
         string path = "Prefabs/" + toInst.className;
         prefab = Resources.Load(path) as GameObject;
-
         GameObject inst = Instantiate(prefab, toInst.standingTile.transform.position, Quaternion.identity);
+        if (toInst.level > 1) toInst.transform.localScale *= Mathf.Pow(1.1f, toInst.level - 1);
+        inst.GetComponent<CharacterController>().SetValuesCharacter(ChampionDatabase.GetDatabaseCharacterController(toInst.level,toInst.GetComponent<CharacterController>().characterName));
         inst.GetComponent<DragObject>().hitTile = toInst.standingTile;
         inst.GetComponent<CharacterController>().standingTile = toInst.standingTile;
         inst.tag = "Ally";
-
-        if (toInst.level == 2) toInst.transform.localScale *= Mathf.Pow(1.1f, toInst.level - 1);
-
-        inst.GetComponent<CharacterController>().SetValuesCharacter(toInst);
         inst.name = inst.GetComponent<CharacterController>().characterName;
 
         AddHealthBarDetails(inst);
+        onBoardAllies.Add(inst);
 
     }
     public void SpawnEnemies(int formation)
@@ -279,6 +259,7 @@ public class GameController : MonoBehaviour
     public void SetFightPreparationStage()
     {
         showBoard = false;
+        fightPreparation = true;
         foreach (GameObject unit in onBoardAllies)
         {
             unit.GetComponent<CharacterController>().putDown = true;
@@ -332,11 +313,13 @@ public class GameController : MonoBehaviour
     }
     public void CheckCharacterUpgrades()
     {
-        foreach (string name in characterNames)
+        //Needed because it gets modified
+        GameObject[] temp = onBoardAllies.ToArray();
+        foreach (GameObject unit in temp)
         {
             for (int i = 1; i <= 2; i++)
             {
-                CombineUnits(name, i, false);
+                CombineUnits(unit.GetComponent<CharacterController>().characterName, i, false);
             }
         }
     }
@@ -344,16 +327,16 @@ public class GameController : MonoBehaviour
     //------------------------------------------Fight stage functions
     public void SetFightStage()
     {
-        GameObject[] onBoardAllies = GameObject.FindGameObjectsWithTag("Ally");
-
+        uiController.ResetStatLayout();
         SaveAlliesBeforFight(onBoardAllies);
         uiController.CreateStatLayout(onBoardAllies, "Ally", "Damage");
-        uiController.CreateStatLayout(GameObject.FindGameObjectsWithTag("Enemy"), "Enemy", "Damage");
+        uiController.CreateStatLayout(GameObject.FindGameObjectsWithTag("Enemy").ToList(), "Enemy", "Damage");
         uiController.CreateStatLayout(onBoardAllies, "Ally", "Heal");
-        uiController.CreateStatLayout(GameObject.FindGameObjectsWithTag("Enemy"), "Enemy", "Heal");
+        uiController.CreateStatLayout(GameObject.FindGameObjectsWithTag("Enemy").ToList(), "Enemy", "Heal");
 
         DisableMoveObjectOnBench();
         fightIsOn = true;
+        fightPreparation = false;
     }
     private void DisableMoveObjectOnBench()
     {
@@ -364,7 +347,7 @@ public class GameController : MonoBehaviour
                 unit.GetComponent<MoveObject>().enabled = false;
         }
     }
-    private void SaveAlliesBeforFight(GameObject[] onBoardAllies)
+    private void SaveAlliesBeforFight(List<GameObject> onBoardAllies)
     {
         foreach (GameObject unit in onBoardAllies)
         {
@@ -397,7 +380,6 @@ public class GameController : MonoBehaviour
         showBoard = true;
         DestroyProjectiles();
 
-        GameObject[] onBoardAllies = GameObject.FindGameObjectsWithTag("Ally");
         GameObject[] survivedEnemys = GameObject.FindGameObjectsWithTag("Enemy");
 
         if (survivedEnemys != null) player.TakeDamage(survivedEnemys.Length);
@@ -411,7 +393,7 @@ public class GameController : MonoBehaviour
         GameObject[] projectiles = GameObject.FindGameObjectsWithTag("Projectile");
         foreach (GameObject projectile in projectiles) Destroy(projectile);
     }
-    private void PrepareOnBoardAllies(GameObject[] onBoardAllies)
+    private void PrepareOnBoardAllies(List<GameObject> onBoardAllies)
     {
         foreach (GameObject ob in onBoardAllies)
         {
@@ -424,9 +406,9 @@ public class GameController : MonoBehaviour
         }
 
     }
-    private void CalculateFightStreak(GameObject[] onBoardAllies, GameObject[] survivedEnemys)
+    private void CalculateFightStreak(List<GameObject> onBoardAllies, GameObject[] survivedEnemys)
     {
-        if (onBoardAllies.Length > survivedEnemys.Length)
+        if (onBoardAllies.Count > survivedEnemys.Length)
         {
             if (player.GetStreak() < 0) player.SetStreak(1);
             else player.AddStreak(1);
@@ -465,33 +447,33 @@ public class GameController : MonoBehaviour
             AddHealthBarDetails(inst);
         
             inst.GetComponent<MoveObject>().enabled = false;
-        
-            CombineUnits(button.name, 1, uiController.GetFightIsOn());
 
             onBenchAllies.Add(inst);
+
+            CombineUnits(character.characterName, 1, uiController.GetFightIsOn());
         }
         else
         {
             //TODO bench is full message
         }
         
+
+
     }
     private void CombineUnits(string name, int level, bool fightIsOn)
     {
-        GameObject[] onBenchAllies = GameObject.FindGameObjectsWithTag("OnBench");
         List<GameObject> foundUnits = new List<GameObject>();
 
-        if (!fightIsOn)
+        if (!fightIsOn && !fightPreparation)
         {
-            GameObject[] allies = GameObject.FindGameObjectsWithTag("Ally");
-            for (int i = 0; i < allies.Length; i++)
+            for (int i = 0; i < onBoardAllies.Count; i++)
             {
-                if (allies[i].GetComponent<CharacterController>().characterName == name && allies[i].GetComponent<CharacterController>().level == level)
-                    foundUnits.Add(allies[i]);
+                if (onBoardAllies[i].GetComponent<CharacterController>().characterName == name && onBoardAllies[i].GetComponent<CharacterController>().level == level)
+                    foundUnits.Add(onBoardAllies[i]);
             }
         }
 
-        for (int i = 0; i < onBenchAllies.Length; i++)
+        for (int i = 0; i < onBenchAllies.Count; i++)
         {
             if (onBenchAllies[i].GetComponent<CharacterController>().characterName == name && onBenchAllies[i].GetComponent<CharacterController>().level == level)
                 foundUnits.Add(onBenchAllies[i]);
@@ -507,21 +489,55 @@ public class GameController : MonoBehaviour
 
                 Destroy(foundUnits[i]);
             }
-            foundUnits[0].gameObject.transform.localScale *= 1.1f;
             GameObject tileToSet = foundUnits[0].GetComponent<CharacterController>().standingTile;
+            GameObject prefab = Resources.Load("Prefabs/" + foundUnits[0].GetComponent<CharacterController>().characterName) as GameObject;
+            GameObject inst = Instantiate(prefab, tileToSet.transform.position, Quaternion.identity);
+            inst.GetComponent<CharacterController>().SetValuesCharacter(ChampionDatabase.GetDatabaseCharacterController(++level,name));
+            inst.GetComponent<CharacterController>().standingTile = tileToSet;
+            inst.GetComponent<CharacterController>().level += 1;
+            inst.name = inst.GetComponent<CharacterController>().characterName;
+            inst.GetComponent<DragObject>().hitTile = tileToSet;
+            AddHealthBarDetails(inst);
+            inst.GetComponent<MoveObject>().enabled = false;
+            inst.gameObject.transform.localScale *= 1.1f;
+            if (foundUnits[0].GetComponent<CharacterController>().tag == "OnBench")
+            {
+                AddCharacterOnBench(inst);
+                RemoveCharacterOnBench(foundUnits[0]);
+            }
+            else
+            {
+                AddCharacterOnBoard(inst);
+                RemoveCharacterOnBoard(foundUnits[0]);
+            }
 
-            foundUnits[0].GetComponent<CharacterController>().SetValuesCharacter(ChampionDatabase.GetDatabaseCharacterController(++level,name));
+            Destroy(foundUnits[0]);
 
-            foundUnits[0].GetComponent<CharacterController>().standingTile = tileToSet;
-
-            foundUnits[0].GetComponent<CharacterController>().level += 1;
-
-            AddHealthBarDetails(foundUnits[0]);
 
             CombineUnits(name, level, fightIsOn);
         }
     }
-    //Bench manipulation
+    private void AddHealthBarDetails(GameObject character)
+    {
+        CharacterController charControl = character.GetComponent<CharacterController>();
+
+        GameObject characterBar = character.transform.FindDeepChild("CharacterBars").gameObject;
+
+        int tickSize = 5;
+        float healthChunkSize = 250;
+
+        int numOfTicks = Mathf.FloorToInt((charControl.health - 1) / healthChunkSize);// this '-10' is because of the spacing 
+        float x = (characterBar.GetComponent<RectTransform>().rect.width - 10 - (tickSize * numOfTicks)) / (charControl.health / healthChunkSize);
+        float offset = tickSize / 2.0f;
+        for (int i = 1; i <= numOfTicks; i++)
+        {
+            GameObject inst = Instantiate(Resources.Load("Prefabs/Tick") as GameObject, new Vector3(0, 0, 0), Quaternion.identity, character.transform.FindDeepChild("HealthBar"));
+            inst.GetComponent<RectTransform>().localPosition = new Vector3(i * x + offset, 0.0f, 0.0f);
+            inst.GetComponent<RectTransform>().localRotation = Quaternion.identity;
+            offset += tickSize;
+        }
+    }
+    //----------------------------------------Bench maipulation functions
     private GameObject[] ResetBench()
     {
         GameObject[] bench = GameObject.FindGameObjectsWithTag("FreeBench");

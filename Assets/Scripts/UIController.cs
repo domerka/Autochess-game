@@ -27,6 +27,7 @@ public class UIController : MonoBehaviour
     private GameObject garbageLeft;
     private GameObject garbageRight;
     private ShopOdds shopOdds;
+    private GameObject fpsCounter;
 
     public GameObject settingsPanel;
 
@@ -51,6 +52,7 @@ public class UIController : MonoBehaviour
         garbageRight = transform.FindDeepChild("GarbageRight").gameObject;
         shopOdds = transform.FindDeepChild("ShopOdds").gameObject.GetComponent<ShopOdds>();
         teamSizeText = transform.FindDeepChild("TeamSizeText").gameObject.GetComponent<TextMeshProUGUI>();
+        fpsCounter = transform.FindDeepChild("FPS Display").gameObject;
         panelOpen = 0;
         damagePanel.SetActive(false);
         healPanel.SetActive(false);
@@ -163,7 +165,14 @@ public class UIController : MonoBehaviour
         }
         SwitchRightSidePanel();
     }
-    public void CreateStatLayout(GameObject[] characters, string characterType, string type)
+    public void ResetStatLayout()
+    {
+        allyDamageDealt.Clear();
+        enemyDamageDealt.Clear();
+        allyDamageHealed.Clear();
+        enemyDamageHealed.Clear();
+    }
+    public void CreateStatLayout(List<GameObject> characters, string characterType, string type)
     {
         GameObject layout = this.transform.FindDeepChild(type + "Layout" + characterType).gameObject;
         for (int i = 0; i < layout.transform.childCount; i++)
@@ -262,6 +271,11 @@ public class UIController : MonoBehaviour
     {
         osb.UpdateUI(amount);
     }
+    public void ToggleFPSCounter()
+    {
+        if (fpsCounter.activeSelf) fpsCounter.SetActive(false);
+        else fpsCounter.SetActive(true);
+    }
     //TODO
     public void UpdateTeamCombinationsUI()
     {
@@ -341,6 +355,8 @@ public class UIController : MonoBehaviour
     {
         isOverGarbage = set;
     }
+
+
 
 
 

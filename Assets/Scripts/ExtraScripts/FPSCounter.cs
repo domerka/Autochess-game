@@ -13,7 +13,7 @@ public class FPSCounter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        fpsDisplay = transform.FindDeepChild("FPS Display").GetComponent<TextMeshProUGUI>();
+        fpsDisplay = GetComponent<TextMeshProUGUI>();
     }
 
     // Update is called once per frame

@@ -366,6 +366,33 @@ public class MoveObject : MonoBehaviour
         return true;
 
     }
+    public bool InRangeTarget()
+    {
+        GameObject enemyTile = target.GetComponent<CharacterController>().standingTile;
+
+        //Remaking the coordinate system for allied tile
+        int allyColumn = character.standingTile.name[0] - '0';
+        int allyRow = character.standingTile.name[1] - '0';
+
+        var xAlly = allyColumn - (allyRow - (allyRow & 1)) / 2;
+        var zAlly = allyRow;
+        var yAlly = -xAlly - zAlly;
+
+        //Remaking the coordinate system for enemy tile
+        int colEnemy = enemyTile.name[0] - '0';
+        int rowEnemy = enemyTile.name[1] - '0';
+
+        var xEnemy = colEnemy - (rowEnemy - (rowEnemy & 1)) / 2;
+        var zEnemy = rowEnemy;
+        var yEnemy = -xEnemy - zEnemy;
+
+        //Calculating the distance between them
+        int range = (Mathf.Abs(xAlly - xEnemy) + Mathf.Abs(yAlly - yEnemy) + Mathf.Abs(zAlly - zEnemy)) / 2;
+
+        if (range > character.attackRange) return false;
+
+        return true;
+    }
     private float CalculateDistanceToEnemy(GameObject enemy)
     {
         return Mathf.Sqrt(Mathf.Pow(enemy.transform.position.x - character.standingTile.transform.position.x, 2) + Mathf.Pow(enemy.transform.position.z - character.standingTile.transform.position.z, 2));

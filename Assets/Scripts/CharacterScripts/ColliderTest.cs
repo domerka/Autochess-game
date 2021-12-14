@@ -9,7 +9,9 @@ public class ColliderTest : MonoBehaviour
         if (other == null) return;
         if (GameObject.FindGameObjectWithTag("GameControl").GetComponent<GameController>().GetFightIsOn())
         {
-            if (other.gameObject.tag == "Enemy" && other.gameObject.name == this.gameObject.transform.root.GetComponent<MoveObject>().target.name)
+            if (gameObject.transform.root.GetComponent<MoveObject>() == null) return;
+            if (!gameObject.transform.root.GetComponent<MoveObject>().InRangeTarget()) return;
+            if (other.gameObject.tag == "Enemy" && other.gameObject.name == gameObject.transform.root.GetComponent<MoveObject>().target.name)
             {
                 this.gameObject.transform.root.GetComponent<MoveObject>().InflictDamage();
             }
