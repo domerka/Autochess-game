@@ -60,9 +60,17 @@ public class PlayerController : MonoBehaviour
     {
         //Delete characterInformationPanel on left click
         if (Input.GetMouseButtonDown(0))
-        {/*
-            GameObject temp = GameObject.Find("CharacterInformationPanel(Clone)");
-            Destroy(temp);*/
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100))
+            {
+                if (!(hit.transform.name.Length > 2))
+                {
+                    GameObject temp = GameObject.Find("CharacterInformationPanel(Clone)");
+                    Destroy(temp);
+                }
+            }
+            
         }
 
         //Move player

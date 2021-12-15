@@ -301,13 +301,6 @@ public class UIController : MonoBehaviour
             UpdateUIOnGoldSpent();
         }
     }
-    public void BuyCharacter(int cost)
-    {
-        if (gameController.BuyCharacter(cost))
-        {
-            UpdateUIOnGoldSpent();
-        }
-    }
     public void UpdateTeamSizeUI()
     {
         teamSizeText.text = gameController.GetNumberOfChampionsOnBoard() + "/" + gameController.GetTeamSize();

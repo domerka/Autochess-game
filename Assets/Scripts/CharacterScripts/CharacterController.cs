@@ -58,8 +58,7 @@ public class CharacterController : MonoBehaviour
         baseHealing = 0;
         healthBar = transform.gameObject.GetComponent<HealthBar>();
         manaBar = transform.gameObject.GetComponent<ManaBar>();
-        moveSpeed = 2.0f;
-
+        moveSpeed = 2.0f; 
     }
 
     private void Start()
@@ -156,6 +155,7 @@ public class CharacterController : MonoBehaviour
                 upgradedStats.Add("health");
                 health += 500;
                 gameObject.GetComponent<CharacterInformationController>().UpdateText("health",health);
+                HealthBarDetails.Add(gameObject);
                 break;
             case "armorButton":
                 upgradedStats.Add("armor");

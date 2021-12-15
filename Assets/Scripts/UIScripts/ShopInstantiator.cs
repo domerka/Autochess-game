@@ -42,8 +42,8 @@ public class ShopInstantiator : MonoBehaviour
             shopPicture.GetComponent<Button>().interactable = shopPicture.GetComponent<CharImageButton>().characterCost > gold ? false : true; 
         }
     }
-    public void OnImageClicked(Sprite button)
+    public void OnImageClicked(Sprite button, int characterCost)
     {
-        gameController.OnShopImageClicked(button);
+        gameController.OnShopImageClicked(button, characterCost);
     }
 }

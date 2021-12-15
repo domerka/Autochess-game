@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4828201410868172127}
   - component: {fileID: 8052756279703572958}
   - component: {fileID: 31616401501360911}
-  - component: {fileID: -3343562609945957049}
   m_Layer: 5
   m_Name: DamagePopUp
   m_TagString: Untagged
@@ -83,7 +82,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &31616401501360911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,19 +100,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &-3343562609945957049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2097043937120843893}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85fe4417a80d47943b221ee886a9a45d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lifetime: 0.5
 --- !u!1 &8804031279412925623
 GameObject:
   m_ObjectHideFlags: 0

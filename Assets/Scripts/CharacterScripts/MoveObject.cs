@@ -467,7 +467,8 @@ public class MoveObject : MonoBehaviour
     //TODO separate non MonoBehaviour class creation for fightPopUp infos
     private void CreateDamagePopUp(float damage)
     {
-        Instantiate(Resources.Load("Prefabs/DamagePopUp") as GameObject, target.transform.position, Quaternion.identity).GetComponent<DamagePopUp>().SetStyle(damage);
+        FightPopupImage.AttackDamagePopup(target.transform.position,damage);
+        //Instantiate(Resources.Load("Prefabs/DamagePopUp") as GameObject, target.transform.position, Quaternion.identity).GetComponent<DamagePopUp>().SetStyle(damage);
     }
     
 

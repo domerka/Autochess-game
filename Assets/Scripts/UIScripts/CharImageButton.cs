@@ -15,7 +15,7 @@ public class CharImageButton : MonoBehaviour, IPointerClickHandler
     {
         if (this.GetComponent<Button>().interactable)
         {
-            shopInstantiator.OnImageClicked(this.GetComponent<Image>().sprite);
+            shopInstantiator.OnImageClicked(this.GetComponent<Image>().sprite, characterCost);
             this.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/placeholder");
             this.GetComponent<Button>().interactable = false;
         }

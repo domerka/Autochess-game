@@ -78,7 +78,6 @@ public class CharacterInformationController : MonoBehaviour
                 inst.transform.FindDeepChild(informationNames[i] + "Button").GetComponent<Button>().interactable = false;
                 continue;
             }
-            print(characterController.upgradedStats.Count);
             switch(characterController.upgradedStats.Count)
             {
                 case (2):
