@@ -51,17 +51,16 @@ public class CharacterInstantiator: MonoBehaviour
         GameObject _spawnPosition = spawnTile;
         _spawnPosition.tag = "OccupiedByEnemy";
         GameObject inst = Instantiate(Resources.Load("Prefabs/"+enemyName) as GameObject, _spawnPosition.transform.position, Quaternion.identity);
-        inst.GetComponent<DragObject>().hitTile = _spawnPosition;
         inst.GetComponent<CharacterController>().standingTile = _spawnPosition;
         inst.tag = "Enemy";
         inst.GetComponent<CharacterController>().type = "Enemy";
         inst.name = "Enemy";
         _spawnPosition.GetComponent<Tile>().isObstacle = true;
         inst.GetComponent<CharacterController>().attackRange = 1;
+        inst.GetComponent<CharacterController>().attackDamage = 150;
         inst.GetComponentInChildren<Renderer>().material.color = Color.red;
         Destroy(inst.GetComponent<DragObject>());
         inst.GetComponent<CharacterController>().health = 1100;
-        inst.GetComponent<CharacterController>().attackRange = 5;
         HealthBarDetails.Add(inst);
     }
     //----------------------------------------Bench maipulation functions

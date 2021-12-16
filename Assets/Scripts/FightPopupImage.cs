@@ -6,7 +6,7 @@ using TMPro;
 
 public class FightPopupImage : MonoBehaviour
 {
-    private static float damagePopupDuration = 0.5f;
+    private static float damagePopupDuration = 1.0f;
 
     //Instantiate a popup
     //Set its different values
@@ -20,18 +20,7 @@ public class FightPopupImage : MonoBehaviour
         inst.transform.LookAt(2 * inst.transform.position - Camera.main.transform.position);
         inst.transform.FindDeepChild("DamageText").GetComponent<TextMeshProUGUI>().text = damage.ToString();
         inst.name = "DamagePopUpTest";
-
-
-        LTBezierPath ltPath = new LTBezierPath(new Vector3[] 
-        {   
-            new Vector3(positon.x, positon.y + 2, 0f), 
-            new Vector3(positon.x+1f, positon.y + 2, 0f), 
-            new Vector3(positon.x+2f, positon.y + 2, 0f), 
-            new Vector3(positon.x+3f, positon.y + 2, 0f) 
-        });
-        LeanTween.move(inst, ltPath ,damagePopupDuration).setOrientToPath(true).setEase(LeanTweenType.easeInOutQuad); // animate
-        inst.transform.LookAt(2 * inst.transform.position - Camera.main.transform.position);
-        //LeanTween.moveX(inst, positon.x + 5, damagePopupDuration);
+        AddLeanTweenDamage(inst);
         Destroy(inst, damagePopupDuration);
     }
 
@@ -84,6 +73,22 @@ public class FightPopupImage : MonoBehaviour
 
     public static void MagicDamageReducedPopup(Vector3 positon, float duration)
     {
+
+    }
+
+
+    private static void AddLeanTweenDamage(GameObject inst)
+    {
+        Vector3 bezierPathPosition = inst.transform.position;
+        LTBezierPath ltPath = new LTBezierPath(new Vector3[]
+        {
+            new Vector3(bezierPathPosition.x, bezierPathPosition.y + 0.2f, bezierPathPosition.z-0.4f),
+            new Vector3(bezierPathPosition.x+0.8f, bezierPathPosition.y+0.2f, bezierPathPosition.z-0.4f),
+            new Vector3(bezierPathPosition.x+0.8f, bezierPathPosition.y+2.2f, bezierPathPosition.z-0.4f),
+            new Vector3(bezierPathPosition.x+0.8f, bezierPathPosition.y, bezierPathPosition.z-0.4f)
+        });
+        LeanTween.move(inst, ltPath, damagePopupDuration).setEase(LeanTweenType.easeInOutQuad);
+        LeanTween.scale(inst, Vector3.zero, damagePopupDuration);
 
     }
 }

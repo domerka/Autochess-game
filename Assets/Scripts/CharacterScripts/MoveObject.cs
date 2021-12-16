@@ -79,7 +79,6 @@ public class MoveObject : MonoBehaviour
 
         if (move && gameController.GetFightIsOn()) 
         {
-
             //Choosing a new target
             if (target.GetComponent<CharacterController>() == null) target = FindClosestEnemy();
             if (target == null) target = FindClosestEnemy();

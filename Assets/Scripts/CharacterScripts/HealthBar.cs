@@ -28,6 +28,7 @@ public class HealthBar : MonoBehaviour
         {
             deathAnimProgress += 0.1f;
             gameObject.transform.FindDeepChild("Cube").GetComponent<SkinnedMeshRenderer>().material.SetFloat("_AnimSpeed", deathAnimProgress);
+            GameObject.FindGameObjectWithTag("GameControl").GetComponent<GameController>().RemoveCharacterOnBoard(gameObject);
             if (deathAnimProgress >= 1.0f) Destroy(gameObject);
         }
 
