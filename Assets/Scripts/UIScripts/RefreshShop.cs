@@ -39,7 +39,7 @@ public class RefreshShop : MonoBehaviour
 
     public void AddBarToInterestBar()
     {
-        GameObject inst = Instantiate(Resources.Load("GoldInterestBar")as GameObject, goldInterestBar.transform);
+        GameObject inst = Instantiate(Resources.Load("Prefabs/GoldInterestBar")as GameObject, goldInterestBar.transform);
         inst.name = "GoldInterestBar6";
     }
 }

@@ -70,7 +70,7 @@ public class UIController : MonoBehaviour
 
         if (!skillTree.GetComponent<SkillTreeAbilityController>().skillTreeSetup)
         {
-            skillTree.GetComponent<SkillTreeAbilityController>().SetupSkillTree(gameController.GetSkillTreeAbilities());
+            skillTree.GetComponent<SkillTreeAbilityController>().SetupSkillTree(gameController.GetSkillTreeAbilities(),gameController.GetSkillTreeDescriptions());
             skillTree.GetComponent<SkillTreeAbilityController>().skillTreeSetup = true;
         }
 

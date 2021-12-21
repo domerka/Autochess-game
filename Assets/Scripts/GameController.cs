@@ -17,6 +17,8 @@ public class GameController : MonoBehaviour
     [SerializeField]private bool fightIsOn;
     private bool showBoard;
     private bool fightPreparation;
+
+    private int opponentStrength;
     
     private int[] xpForNextLevel;
 
@@ -45,6 +47,9 @@ public class GameController : MonoBehaviour
     private int maxIncome;
 
 
+    private int numberOfWins;
+
+
     private void Awake()
     {
         spawnEnemyDictionary = new Dictionary<int, string[]>();
@@ -58,6 +63,8 @@ public class GameController : MonoBehaviour
         xp = 2;
         maxIncome = 50;
         maxLevel = 10;
+        numberOfWins = 0;
+        opponentStrength = 0;
 
         fightStreakGold = new int[6] { 0, 1, 1, 2, 3, 4 };
         xpForNextLevel = new int[] { 4, 16, 24, 36, 60, 84, 100, 120, 132, 140,180 };
@@ -66,11 +73,13 @@ public class GameController : MonoBehaviour
         onBenchAllies = new List<GameObject>();
         onBoardAllies = new List<GameObject>();
         activeSkillTreeNumbers = new List<int>();
+        upgradedSkillTreeNumbers = new List<int>();
 
         CreateShopOdss();
         CreateCharacterPool();
         CreateSpawnEnemydictionary();
         ChampionDatabase.LoadBatabases();
+        ExtraDatabases.LoadDatabases();
     }
 
     // Start is called before the first frame update
@@ -120,6 +129,7 @@ public class GameController : MonoBehaviour
     {
         if (gold >= 4)
         {
+            if(upgradedSkillTreeNumbers.Contains(16))xp += 1;
             xp += 4;
             gold -= 4;
             if (xp >= xpForNextLevel[level - 1])
@@ -150,15 +160,21 @@ public class GameController : MonoBehaviour
     //------------------------------------------Preparation stage functions
     public void SetPreparationStage()
     {
-        if (upgradedSkillTreeNumbers.Contains(14)) gold += onBenchAllies.Count;
+        GameObject[] survivedEnemys = GameObject.FindGameObjectsWithTag("Enemy");
+        int damageToPlayer = upgradedSkillTreeNumbers.Contains(26) ? survivedEnemys.Length - 1 + opponentStrength : survivedEnemys.Length + opponentStrength;
+        if (survivedEnemys != null) player.TakeDamage(damageToPlayer);
+
+        if (player.health < 0 && upgradedSkillTreeNumbers.Contains(25)) player.health = 10;
+        if (upgradedSkillTreeNumbers.Contains(14) && survivedEnemys.Length == 0) gold += onBoardAllies.Count;
+        if (survivedEnemys.Length == 0) numberOfWins++;
         DestroyAllUnits();
 
         ResetBoard();
 
-        AddXPAfterFight();
+        AddXp(2);
 
         CalculateNextIncome();
-
+        //-----------------------------------------Skill tree ability upgrades
         if(upgradedSkillTreeNumbers.Contains(4)) player.AddHealth(1);
         if (upgradedSkillTreeNumbers.Contains(5)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().AddHealth(50);
         if (upgradedSkillTreeNumbers.Contains(6)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().AddDamage(10);
@@ -166,21 +182,12 @@ public class GameController : MonoBehaviour
         if (upgradedSkillTreeNumbers.Contains(8)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetBaseHealing(80);
         if (upgradedSkillTreeNumbers.Contains(9)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetAttackDamageHealing(10);
         if (upgradedSkillTreeNumbers.Contains(10)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetMagicDamageHealing(10);
-        if (upgradedSkillTreeNumbers.Contains(11)) xp += 1;
-        if (upgradedSkillTreeNumbers.Contains(12)) if(onBenchAllies.Count == 0) xp += 2;
-        if (upgradedSkillTreeNumbers.Contains(13)) gold += Mathf.FloorToInt(onBenchAllies.Count/2);
+        if (upgradedSkillTreeNumbers.Contains(11)) AddXp(1);
+        if (upgradedSkillTreeNumbers.Contains(12)) if(onBenchAllies.Count == 0) AddXp(2);
+        if (upgradedSkillTreeNumbers.Contains(13)) gold += Mathf.FloorToInt(onBoardAllies.Count / 2);
+
 
         uiController.UpdateUI();
-    }
-    private void AddXPAfterFight()
-    {
-        xp += 2;
-        if (xp >= xpForNextLevel[level - 1])
-        {
-            player.AddSkillPoints(1);
-            level++;
-            xp = xp - xpForNextLevel[level - 2];
-        }
     }
     private void CalculateNextIncome()
     {
@@ -226,6 +233,8 @@ public class GameController : MonoBehaviour
     }
     public void SpawnEnemies(int formation)
     {
+        //TODO dependent on the opponent strength
+
         for (int i = 0; i < spawnEnemyDictionary[formation].Length; i++)
         {
             GameObject spawnTile = GameObject.Find(spawnEnemyDictionary[formation][i]);
@@ -359,8 +368,6 @@ public class GameController : MonoBehaviour
 
         GameObject[] survivedEnemys = GameObject.FindGameObjectsWithTag("Enemy");
 
-        if (survivedEnemys != null) player.TakeDamage(survivedEnemys.Length);
-
         PrepareOnBoardAllies(onBoardAllies);
         CalculateFightStreak(onBoardAllies, survivedEnemys);
         
@@ -464,7 +471,7 @@ public class GameController : MonoBehaviour
                 gold += 10;
                 break;
             case (2)://Gain 10 xp
-                xp += 10;
+                AddXp(10);
                 break;
             case (3)://Gain 2 more skill points
                 player.AddSkillPoints(2);
@@ -496,7 +503,7 @@ public class GameController : MonoBehaviour
             case (12)://Every turn gain two xp if bench is clear
                 upgradedSkillTreeNumbers.Add(12);
                 break;
-            case (13)://Every turn gain one gold for every two units onBoard
+            case (13)://Every turn gain one gold for every two surviving units onBoard
                 upgradedSkillTreeNumbers.Add(13);
                 break;
             case (14)://If you win the round gain 1 gold for every unit
@@ -506,16 +513,16 @@ public class GameController : MonoBehaviour
                 maxIncome += 10;
                 uiController.AddBarToInterestBar();
                 break;
-            case (16):
+            case (16)://Gain one more xp for levelling
+                upgradedSkillTreeNumbers.Add(16);
+                break;
+            case (17)://Remove enemy armor
 
                 break;
-            case (17):
+            case (18)://Remove enemy healing
 
                 break;
-            case (18):
-
-                break;
-            case (19):
+            case (19)://Remove enemy magic resist
 
                 break;
             case (20):
@@ -531,14 +538,14 @@ public class GameController : MonoBehaviour
             case (23)://Player heals 10 Hp
                 player.AddHealth(10);
                 break;
-            case (24):
+            case (24)://Trade health for gold one time
 
                 break;
-            case (25):
-
+            case (25)://Sudden death
+                upgradedSkillTreeNumbers.Add(25);
                 break;
-            case (26):
-
+            case (26)://Take one less damage after fight
+                upgradedSkillTreeNumbers.Add(26);
                 break;
             case (27):
 
@@ -565,14 +572,20 @@ public class GameController : MonoBehaviour
             case (34)://Gain a random two star five cost unit ---------TODO
 
                 break;
-            case (35):
-
+            case (35)://Your units gain stats based on how many wins you have
+                upgradedSkillTreeNumbers.Add(35);
                 break;
-            case (36):
-
+            case (36)://Lower opponent strength by one
+                opponentStrength--;
                 break;
         }
         uiController.UpdateUI();
+    }
+
+    public void ManageOpponentStrength()
+    {
+        opponentStrength++;
+        uiController.UpdateOSB(opponentStrength);
     }
 
     //Important function
@@ -657,6 +670,13 @@ public class GameController : MonoBehaviour
     public void AddXp(int amount)
     {
         xp += amount;
+        if (xp >= xpForNextLevel[level - 1])
+        {
+            player.AddSkillPoints(1);
+            teamSize++;
+            level++;
+            xp = xp - xpForNextLevel[level - 2];
+        }
         uiController.UpdateUIOnLevelUp();
     }
 
@@ -756,6 +776,13 @@ public class GameController : MonoBehaviour
         }
 
         return activeSkillTreeNumbers;
+    }
+    public List<string> GetSkillTreeDescriptions()
+    {
+        List<string> temp = new List<string>();
+        foreach (int skillTreeNumber in activeSkillTreeNumbers) temp.Add(ExtraDatabases.GetAbilityDescriptions(skillTreeNumber));
+
+        return temp;
     }
 
     public int GetMaxIncome()

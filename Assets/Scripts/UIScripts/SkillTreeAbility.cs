@@ -51,11 +51,7 @@ public class SkillTreeAbility : MonoBehaviour
                         connection.transform.FindDeepChild("Image" + (i + 1)).GetComponent<Image>().color = Color.yellow;
                     }
                 }
-
-                skillTreeAbilityController.AddSkillPoints(-cost);
-                skillTreeAbilityController.CheckUpgrades();
-                skillTreeAbilityController.SetText();
-                skillTreeAbilityController.AddSkillTreeBonus(serialNumber);
+                skillTreeAbilityController.OnSkillTreeAbilityClicked(-cost,serialNumber);
             }
         }
     }

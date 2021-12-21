@@ -13,10 +13,6 @@ public class LevelController : MonoBehaviour
     public TextMeshProUGUI stageText;
 
     private GameController gameController;
-
-    private UIController uiController;
-
-    private int opponentStrength;
     private int stageCounter;
     private float currentTime;
     private float time;
@@ -33,7 +29,6 @@ public class LevelController : MonoBehaviour
 
     private void Awake()
     {
-        opponentStrength = 0;
         numOfStages = 5;
         stageCounter = -1;
 
@@ -51,8 +46,7 @@ public class LevelController : MonoBehaviour
     {
         
         gameController = GameObject.FindGameObjectWithTag("GameControl").GetComponent<GameController>();
-        uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
-        ManageOpponentStrength();
+        gameController.ManageOpponentStrength();
     }
 
     // Update is called once per frame
@@ -118,7 +112,7 @@ public class LevelController : MonoBehaviour
     //------------------------------------Stage controller functions
     private void SetPreparationStage()
     {
-        if (Mathf.CeilToInt(stageCounter / numOfStages) % 5 == 0) ManageOpponentStrength();
+        if (Mathf.CeilToInt(stageCounter / numOfStages) % 5 == 0) gameController.ManageOpponentStrength();
         SetTime(preparationStageLength);
         gameController.SetPreparationStage();
         gameController.SpawnEnemies(0);
@@ -148,20 +142,11 @@ public class LevelController : MonoBehaviour
         gameController.SetEndFightStage();
     }
     //------------------------------------
-
-    //Should be done by gameController
-    private void ManageOpponentStrength()
-    {
-        opponentStrength++;
-        uiController.UpdateOSB(opponentStrength);
-    }
-
     private void SetTime(float timeToSet)
     {
         time = timeToSet;
         currentTime = time;
     }
-
     public void SkipPreparationStage()
     {
         if(isPreparationStage && currentTime > preparationStageLength/2.0f && currentTime < preparationStageLength - 1.0f)

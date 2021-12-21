@@ -1,0 +1,37 @@
+﻿serialNumber;description;title
+1;Gain 10 gold.;Riches
+2;Gain 10 experience points.;_placeholder_
+3;Gain 2 more skill points.;_placeholder_
+4;Leader heals 1 health after every fight.;_placeholder_
+5;Units on the board gain 50 health permanently.;_placeholder_
+6;Units on the board gain 10 attack damage permanently.;_placeholder_
+7;Units on the board gain 10 magic damage permanently.;_placeholder_
+8;Units heal 80 health every second during combat.;_placeholder_
+9;Units heal for 10% of their attack damage dealt.;_placeholder_
+10;Units heal for 10% of their magic damage dealt.;_placeholder_
+11;Gain 1 experience point after every fight.;_placeholder_
+12;Gain 2 experience points after every fight when your bench is empty.;_placeholder_
+13;Gain 1 gold every round for every two units on board.;_placeholder_
+14;Gain 1 gold for every surviving units each round.;_placeholder_
+15;Maximum possible interest increases to six.;_placeholder_
+16;Gain 1 additional experience point for leveling.;_placeholder_
+17;Critical hits remove enemies armor for 5 seconds.;_placeholder_
+18;First auto attack cuts targets healing  by 50% for 5 seconds.;_placeholder_
+19;Abilities remove targets magic resistance for 5 seconds.;_placeholder_
+20;_placeholder_;_placeholder_
+21;Gain 20 gold.;Riches
+22;Maximum level is increased to 11 (from 10).;_placeholder_
+23;Leader heals for 10 health.;_placeholder_
+24;Trade an amount of health for the same amount of gold once.;_placeholder_
+25;Take one less damage after each fight.;_placeholder_
+26;_placeholder_;_placeholder_
+27;_placeholder_;_placeholder_
+28;_placeholder_;_placeholder_
+29;_placeholder_;_placeholder_
+30;_placeholder_;_placeholder_
+31;Team size increases by 2.;_placeholder_
+32;Gain 30 gold.;Riches
+33;Leader heals for 20 health.;_placeholder_
+34;Gain a random 2 star legendary unit.;_placeholder_
+35;Units gain stats based on the number of wins.;_placeholder_
+36;Lower opponents strength by 1.;_placeholder_
