@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour
     //-------------------Basic variables
     private int level;
     private int gold;
+    private int maxLevel;
     [SerializeField]private int teamSize;
     private int nextIncome;
     private int xp;
@@ -18,6 +19,8 @@ public class GameController : MonoBehaviour
     private bool fightPreparation;
     
     private int[] xpForNextLevel;
+
+    private int boardNumber;
 
     private Dictionary<string, int> championPool;
     private Dictionary<int, string[]> spawnEnemyDictionary;
@@ -35,6 +38,13 @@ public class GameController : MonoBehaviour
     [SerializeField] private List<GameObject> onBoardAllies;
     [SerializeField] private List<GameObject> onBenchAllies;
 
+    private List<int> activeSkillTreeNumbers;
+
+    private List<int> upgradedSkillTreeNumbers;
+
+    private int maxIncome;
+
+
     private void Awake()
     {
         spawnEnemyDictionary = new Dictionary<int, string[]>();
@@ -46,13 +56,16 @@ public class GameController : MonoBehaviour
         showBoard = true;
         fightPreparation = false;
         xp = 2;
+        maxIncome = 50;
+        maxLevel = 10;
 
         fightStreakGold = new int[6] { 0, 1, 1, 2, 3, 4 };
-        xpForNextLevel = new int[] { 4, 16, 24, 36, 60, 84, 100, 120, 132, 140 };
+        xpForNextLevel = new int[] { 4, 16, 24, 36, 60, 84, 100, 120, 132, 140,180 };
         shopOdds = new Dictionary<int, int[]>();
         savedAlliesBeforeFight = new List<CharacterController>();
         onBenchAllies = new List<GameObject>();
         onBoardAllies = new List<GameObject>();
+        activeSkillTreeNumbers = new List<int>();
 
         CreateShopOdss();
         CreateCharacterPool();
@@ -65,6 +78,11 @@ public class GameController : MonoBehaviour
     {
         uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
         player = GameObject.FindGameObjectWithTag("PlayerController").GetComponent<PlayerController>();
+    }
+
+    public void LoadSave(SaveGameData saveGameData)
+    {
+
     }
 
     //-------------------------------------------Initialising functions
@@ -94,6 +112,7 @@ public class GameController : MonoBehaviour
         shopOdds.Add(8, new int[] { 5, 15, 50, 25, 5 });
         shopOdds.Add(9, new int[] { 5, 15, 30, 35, 15 });
         shopOdds.Add(10, new int[] { 0, 5, 30, 40, 25 });
+        shopOdds.Add(11, new int[] { 1, 5, 20, 24, 50 });
     }
 
     //-------------------------------------------UI helper game logic functions
@@ -131,6 +150,7 @@ public class GameController : MonoBehaviour
     //------------------------------------------Preparation stage functions
     public void SetPreparationStage()
     {
+        if (upgradedSkillTreeNumbers.Contains(14)) gold += onBenchAllies.Count;
         DestroyAllUnits();
 
         ResetBoard();
@@ -138,7 +158,18 @@ public class GameController : MonoBehaviour
         AddXPAfterFight();
 
         CalculateNextIncome();
-        
+
+        if(upgradedSkillTreeNumbers.Contains(4)) player.AddHealth(1);
+        if (upgradedSkillTreeNumbers.Contains(5)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().AddHealth(50);
+        if (upgradedSkillTreeNumbers.Contains(6)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().AddDamage(10);
+        if (upgradedSkillTreeNumbers.Contains(7)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().AddMagicDamage(10);
+        if (upgradedSkillTreeNumbers.Contains(8)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetBaseHealing(80);
+        if (upgradedSkillTreeNumbers.Contains(9)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetAttackDamageHealing(10);
+        if (upgradedSkillTreeNumbers.Contains(10)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetMagicDamageHealing(10);
+        if (upgradedSkillTreeNumbers.Contains(11)) xp += 1;
+        if (upgradedSkillTreeNumbers.Contains(12)) if(onBenchAllies.Count == 0) xp += 2;
+        if (upgradedSkillTreeNumbers.Contains(13)) gold += Mathf.FloorToInt(onBenchAllies.Count/2);
+
         uiController.UpdateUI();
     }
     private void AddXPAfterFight()
@@ -415,14 +446,133 @@ public class GameController : MonoBehaviour
             CombineUnits(name, level, fightIsOn);
         }
     }
-    
-    
+   
 
     //TODO
     //-----------------------------------------Team combination functions
     public void AddTeamCombinationBonuses()
     {
 
+    }
+
+    public void AddSkillTreeBonus(int serialNumber)
+    {
+        switch (serialNumber)
+        {
+            //LEVEL 1
+            case (1)://Gain 10 gold
+                gold += 10;
+                break;
+            case (2)://Gain 10 xp
+                xp += 10;
+                break;
+            case (3)://Gain 2 more skill points
+                player.AddSkillPoints(2);
+                break;
+            case (4)://Heal yourself for 1 health after every round
+                upgradedSkillTreeNumbers.Add(4);
+                break;
+            case (5)://Your units onBoard gain 50 health permanently
+                upgradedSkillTreeNumbers.Add(5);
+                break;
+            case (6)://Your units onBoard gain 10 AD permanently
+                upgradedSkillTreeNumbers.Add(6);
+                break;
+            case (7)://Your units onBoard gain 10 MD permanently
+                upgradedSkillTreeNumbers.Add(7);
+                break;
+            case (8)://Add baseHealing
+                upgradedSkillTreeNumbers.Add(8);
+                break;
+            case (9)://Add healing based off attackDamge
+                upgradedSkillTreeNumbers.Add(9);
+                break;
+            case (10)://Add healing based off magicDamge
+                upgradedSkillTreeNumbers.Add(10);
+                break;
+            case (11)://Every turn gain one xp
+                upgradedSkillTreeNumbers.Add(11);
+                break;
+            case (12)://Every turn gain two xp if bench is clear
+                upgradedSkillTreeNumbers.Add(12);
+                break;
+            case (13)://Every turn gain one gold for every two units onBoard
+                upgradedSkillTreeNumbers.Add(13);
+                break;
+            case (14)://If you win the round gain 1 gold for every unit
+                upgradedSkillTreeNumbers.Add(14);
+                break;
+            case (15)://Increase max income to 6
+                maxIncome += 10;
+                uiController.AddBarToInterestBar();
+                break;
+            case (16):
+
+                break;
+            case (17):
+
+                break;
+            case (18):
+
+                break;
+            case (19):
+
+                break;
+            case (20):
+
+                break;
+            //LEVEL 2
+            case (21):// Get gold level 2
+                gold += 20;
+                break;
+            case (22):// You can reach level 11
+                maxLevel += 1;
+                break;
+            case (23)://Player heals 10 Hp
+                player.AddHealth(10);
+                break;
+            case (24):
+
+                break;
+            case (25):
+
+                break;
+            case (26):
+
+                break;
+            case (27):
+
+                break;
+            case (28):
+
+                break;
+            case (29):
+
+                break;
+            case (30):
+
+            //LEVEL 3 
+                break;
+            case (31)://Your team gains +2 teamSize
+                teamSize += 2;
+                break;
+            case (32)://Get gold level 3
+                gold += 30;
+                break;
+            case (33)://Player heals 20 damage
+                player.AddHealth(20);
+                break;
+            case (34)://Gain a random two star five cost unit ---------TODO
+
+                break;
+            case (35):
+
+                break;
+            case (36):
+
+                break;
+        }
+        uiController.UpdateUI();
     }
 
     //Important function
@@ -517,7 +667,7 @@ public class GameController : MonoBehaviour
 
     public int GetNextIncome()
     {
-        int interest = gold > 50 ? (int)Mathf.Floor((gold - (gold - 50)) / 10) : (int)Mathf.Floor(gold / 10);
+        int interest = gold > maxIncome ? (int)Mathf.Floor((gold - (gold - maxIncome)) / 10) : (int)Mathf.Floor(gold / 10);
         nextIncome = Mathf.Abs(player.GetStreak()) < 6 ? 5 + interest + fightStreakGold[Mathf.Abs(player.GetStreak())] : 5 + interest + fightStreakGold[Mathf.Abs(player.GetStreak() - (player.GetStreak() - 5))];
         return nextIncome;
     }
@@ -563,7 +713,60 @@ public class GameController : MonoBehaviour
         uiController.UpdateTeamSizeUI();
     }
 
+    public void SetBoardNumber(int amount)
+    {
+        boardNumber = amount;
+    }
 
+    public int GetBoardNumber()
+    {
+        return boardNumber;
+    }
+
+    public List<int> GetSkillTreeAbilities()
+    {
+        for(int i  = 0; i < 7; i++)
+        {
+            int rand = Random.Range(1, 22);
+            while (activeSkillTreeNumbers.Contains(rand))
+            {
+                rand = Random.Range(1, 22);
+            }
+            activeSkillTreeNumbers.Add(rand);
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            int rand = Random.Range(22, 31);
+            while (activeSkillTreeNumbers.Contains(rand))
+            {
+                rand = Random.Range(22, 31);
+            }
+            activeSkillTreeNumbers.Add(rand);
+        }
+
+        for (int i = 0; i < 2; i++)
+        {
+            int rand = Random.Range(31, 37);
+            while (activeSkillTreeNumbers.Contains(rand))
+            {
+                rand = Random.Range(31, 37);
+            }
+            activeSkillTreeNumbers.Add(rand);
+        }
+
+        return activeSkillTreeNumbers;
+    }
+
+    public int GetMaxIncome()
+    {
+        return maxIncome;
+    }
+
+    public int GetMaxLevel()
+    {
+        return maxLevel;
+    }
 
 }
 

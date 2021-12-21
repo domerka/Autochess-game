@@ -11,6 +11,7 @@ public class CharacterController : MonoBehaviour
 
     public string type;
 
+    public float maxHealth;
     public float health;
     public int attackRange;
     public float attackSpeed;
@@ -19,6 +20,9 @@ public class CharacterController : MonoBehaviour
     public int magicDamage;
     public int attackDamage;
     public int critChance;
+
+    public int attackDamageHealing;
+    public int magicDamageHealing;
 
     public float moveSpeed;
 
@@ -72,6 +76,7 @@ public class CharacterController : MonoBehaviour
         string _traitName, int _level, int _cost, string _abilityDescription, int _maxMana, int _startingMana,
         int _armor, int _magicResist, int _magicDamage, int _attackDamage, int _critChance, bool _ranged, string _projectileName)
     {
+        maxHealth = _health;
         characterName = _championName;
         health = _health;
         type = _type;
@@ -97,6 +102,7 @@ public class CharacterController : MonoBehaviour
 
     public void SetValuesCharacter(CharacterController character)
     {
+        maxHealth = character.health;
         characterName = character.characterName;
         health = character.health;
         type = character.type;
@@ -263,6 +269,34 @@ public class CharacterController : MonoBehaviour
     public void AddDamage(int amount)
     {
         attackDamage += amount;
+    }
+
+    public void AddHealth(int amount)
+    {
+        health += amount;
+    }
+
+    public void AddMagicDamage(int amount)
+    {
+        magicDamage += amount;
+    }
+
+    public void HealHealth(int amount)
+    {
+        if(health < maxHealth)
+        {
+            if(health + amount > maxHealth)  health = maxHealth;
+            else  health += amount;
+        }
+    }
+
+    public void SetAttackDamageHealing(int amount)
+    {
+        attackDamageHealing = amount;
+    }
+    public void SetMagicDamageHealing(int amount)
+    {
+        magicDamageHealing = amount;
     }
 
 }

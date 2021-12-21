@@ -29,11 +29,16 @@ public class MoveObject : MonoBehaviour
     private float stunCurrent;
     private float stunDuration;
 
+    private float healDuration;
+
+    private float fightStartOffset;
+
     private void Awake()
     {
         gridList = new List<GameObject>();
         stunCurrent = 0.0f;
         rotationSpeed = 10.0f;
+        healDuration = 1.0f;
     }
 
     void Start()
@@ -48,6 +53,8 @@ public class MoveObject : MonoBehaviour
 
     void Update()
     {
+
+
         if(Time.time > stunCurrent && character.stunned)
         {
             stunCurrent += 0.1f;
@@ -74,6 +81,7 @@ public class MoveObject : MonoBehaviour
             {
                 tileToMoveTo = PathFinding(target);
             }
+            fightStartOffset = Time.time;
         }
 
 
@@ -107,6 +115,17 @@ public class MoveObject : MonoBehaviour
             {
                 CastAbility();
             }
+
+            //Add healing
+            if(character.baseHealing != 0)
+            {
+                if (Time.time - fightStartOffset > healDuration)
+                {
+                    character.HealDamage(character.baseHealing);
+                    healDuration += 1.0f;
+                }
+            }
+            
         }
 
         //Resetting animations to idle once the fight is over
@@ -156,6 +175,8 @@ public class MoveObject : MonoBehaviour
             character.damageDealt += damage;
             CreateDamagePopUp(damage);
             character.AddMana(20);
+            if (character.attackDamageHealing != 0)  character.AddHealth(Mathf.FloorToInt((damage/100)*character.attackDamageHealing));
+            
         }
         else
         {
@@ -186,6 +207,8 @@ public class MoveObject : MonoBehaviour
     private void CastAbility()
     {
         character.SetMana(0);
+        //TODO UPDate magicDamage in mathf.FloorToInt
+        if (character.magicDamageHealing != 0) character.AddHealth(Mathf.FloorToInt((character.magicDamage / 100) * character.attackDamageHealing));
         AbilityController.CastAbility(character.name);
     }
     private void ShootProjectile()

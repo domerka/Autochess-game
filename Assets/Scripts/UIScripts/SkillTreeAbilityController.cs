@@ -21,7 +21,12 @@ public class SkillTreeAbilityController : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("PlayerController").GetComponent<PlayerController>();
     }
 
-    public void SetupSkillTree()
+    public void LoadSave(List<GameObject> skillTreeAbilities)
+    {
+
+    }
+
+    public void SetupSkillTree(List<int> serialNumbers)
     {
         skillTreeAbilities = new List<GameObject>();
         for (int i = 0; i < 12; i++)
@@ -34,6 +39,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection1-8").gameObject);
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().SetUpgradable(true);
                 skillTreeAbilities[i].GetComponent<Button>().interactable = true;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 1)
@@ -42,6 +48,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection2-8").gameObject);
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().SetUpgradable(true);
                 skillTreeAbilities[i].GetComponent<Button>().interactable = true;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 2)
@@ -50,6 +57,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection3-9").gameObject);
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().SetUpgradable(true);
                 skillTreeAbilities[i].GetComponent<Button>().interactable = true;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 3)
@@ -58,6 +66,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection4-9").gameObject);
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().SetUpgradable(true);
                 skillTreeAbilities[i].GetComponent<Button>().interactable = true;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 4)
@@ -66,6 +75,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection5-10").gameObject);
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().SetUpgradable(true);
                 skillTreeAbilities[i].GetComponent<Button>().interactable = true;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 5)
@@ -74,6 +84,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection6-10").gameObject);
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().SetUpgradable(true);
                 skillTreeAbilities[i].GetComponent<Button>().interactable = true;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 6)
@@ -82,6 +93,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection7-10").gameObject);
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().SetUpgradable(true);
                 skillTreeAbilities[i].GetComponent<Button>().interactable = true;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 7)
@@ -90,6 +102,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().previousAbilities.Add(skillTreeAbilities[1].GetComponent<SkillTreeAbility>());
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection8-11").gameObject);
                 skillTreeAbilities[i].GetComponent<Button>().interactable = false;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 8)
@@ -99,6 +112,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection9-11").gameObject);
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection9-12").gameObject);
                 skillTreeAbilities[i].GetComponent<Button>().interactable = false;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 9)
@@ -108,6 +122,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().previousAbilities.Add(skillTreeAbilities[6].GetComponent<SkillTreeAbility>());
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().connections.Add(transform.FindDeepChild("Connection10-12").gameObject);
                 skillTreeAbilities[i].GetComponent<Button>().interactable = false;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 10)
@@ -115,6 +130,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().previousAbilities.Add(skillTreeAbilities[7].GetComponent<SkillTreeAbility>());
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().previousAbilities.Add(skillTreeAbilities[8].GetComponent<SkillTreeAbility>());
                 skillTreeAbilities[i].GetComponent<Button>().interactable = false;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
             if (i == 11)
@@ -122,6 +138,7 @@ public class SkillTreeAbilityController : MonoBehaviour
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().previousAbilities.Add(skillTreeAbilities[8].GetComponent<SkillTreeAbility>());
                 skillTreeAbilities[i].GetComponent<SkillTreeAbility>().previousAbilities.Add(skillTreeAbilities[9].GetComponent<SkillTreeAbility>());
                 skillTreeAbilities[i].GetComponent<Button>().interactable = false;
+                skillTreeAbilities[i].GetComponent<SkillTreeAbility>().serialNumber = serialNumbers[i];
                 continue;
             }
 
@@ -179,6 +196,11 @@ public class SkillTreeAbilityController : MonoBehaviour
             }
         }
         uiController.UpdatePlayerInformationPanel();
+    }
+
+    public void AddSkillTreeBonus(int serialNumber)
+    {
+        uiController.AddSkillTreeBonus(serialNumber);
     }
 
    

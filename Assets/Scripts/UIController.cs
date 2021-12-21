@@ -70,7 +70,7 @@ public class UIController : MonoBehaviour
 
         if (!skillTree.GetComponent<SkillTreeAbilityController>().skillTreeSetup)
         {
-            skillTree.GetComponent<SkillTreeAbilityController>().SetupSkillTree();
+            skillTree.GetComponent<SkillTreeAbilityController>().SetupSkillTree(gameController.GetSkillTreeAbilities());
             skillTree.GetComponent<SkillTreeAbilityController>().skillTreeSetup = true;
         }
 
@@ -243,12 +243,13 @@ public class UIController : MonoBehaviour
     {
         UpdateUIOnGoldSpent();
         UpdateUIOnLevelUp();
+        UpdateTeamSizeUI();
         UpdatePlayerInformationPanel();
         RefreshShop();
     }
     public void UpdateUIOnLevelUp()
     {
-        levelUp.UpdateUI(gameController.GetLevel(),gameController.GetXp(), gameController.GetXpForNextLevel(),gameController.GetGold());
+        levelUp.UpdateUI(gameController.GetLevel(),gameController.GetXp(), gameController.GetXpForNextLevel(),gameController.GetGold(), gameController.GetMaxLevel());
 
         //Skill points
         skillTree.GetComponent<SkillTreeAbilityController>().SetText();
@@ -260,7 +261,7 @@ public class UIController : MonoBehaviour
     public void UpdateUIOnGoldSpent()
     {
         UpdateUIOnLevelUp();
-        refreshShop.UpdateUI(gameController.GetGold(), gameController.GetNextIncome());
+        refreshShop.UpdateUI(gameController.GetGold(), gameController.GetNextIncome(),gameController.GetMaxIncome());
         shopInstantiator.UpdateUI(gameController.GetGold());
     }
     public void UpdatePlayerInformationPanel()
@@ -349,7 +350,15 @@ public class UIController : MonoBehaviour
         isOverGarbage = set;
     }
 
+    public void AddSkillTreeBonus(int serialNumber)
+    {
+        gameController.AddSkillTreeBonus(serialNumber);
+    }
 
+    public void AddBarToInterestBar()
+    {
+        refreshShop.AddBarToInterestBar();
+    }
 
 
 

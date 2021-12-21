@@ -18,12 +18,12 @@ public class RefreshShop : MonoBehaviour
         refreshShopButton = this.transform.FindDeepChild("RefreshShopButton").gameObject.GetComponent<Button>();
     }
 
-    public void UpdateUI(int gold, int nextIncome)
+    public void UpdateUI(int gold, int nextIncome, int maxIncome)
     {
         goldText.text = gold.ToString();
         nextIncomeText.text = nextIncome.ToString();
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < maxIncome/10; i++)
         {
             if (i + 1 <= Mathf.Floor(gold / 10)) goldInterestBar.transform.FindDeepChild("GoldInterestBar" + (i + 1)).GetComponent<Image>().color = Color.yellow;
             else goldInterestBar.transform.FindDeepChild("GoldInterestBar" + (i + 1)).GetComponent<Image>().color = Color.white;
@@ -35,5 +35,11 @@ public class RefreshShop : MonoBehaviour
     private void SetButtonInteractable(bool interactable)
     {
         refreshShopButton.interactable = interactable;
+    }
+
+    public void AddBarToInterestBar()
+    {
+        GameObject inst = Instantiate(Resources.Load("GoldInterestBar")as GameObject, goldInterestBar.transform);
+        inst.name = "GoldInterestBar6";
     }
 }

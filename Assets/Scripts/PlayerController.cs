@@ -26,8 +26,6 @@ public class PlayerController : MonoBehaviour
 
     Animator animationController;
 
-    Camera cam;
-
     private bool allowMove = false;
 
     private Vector3 pointToMoveTo;
@@ -43,7 +41,6 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         animationController = this.GetComponent<Animator>();
-        cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 
         fightStreak = 0;
 
@@ -166,6 +163,11 @@ public class PlayerController : MonoBehaviour
     public int GetSkillPoints()
     {
         return skillPoints;
+    }
+
+    public void AddHealth(int amount)
+    {
+        health += amount;
     }
 
 }

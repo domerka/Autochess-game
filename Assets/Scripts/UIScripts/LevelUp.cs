@@ -18,8 +18,17 @@ public class LevelUp : MonoBehaviour
         levelUpButton = this.transform.FindDeepChild("LevelUpButton").GetComponent<Button>();
     }
     
-    public void UpdateUI(int level, int xp, int xpForNextLevel, int gold)
+    public void UpdateUI(int level, int xp, int xpForNextLevel, int gold, int maxLevel)
     {
+        if(level == maxLevel)
+        {
+            levelText.text = level.ToString();
+            levelProgressionText.text = "Max.";
+            SetButtonInteractable(false);
+            return;
+        }
+
+
         levelText.text = level.ToString();
         levelProgressionText.text = xp + "/" + xpForNextLevel;
 

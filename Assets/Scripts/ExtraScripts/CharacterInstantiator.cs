@@ -46,6 +46,21 @@ public class CharacterInstantiator: MonoBehaviour
         HealthBarDetails.Add(inst);
         return inst;
     }
+    public static GameObject InstantiateLoadGame(CharacterController toInst,string tag)
+    {
+        GameObject inst = Instantiate(Resources.Load("Prefabs/" + toInst.className) as GameObject, toInst.standingTile.transform.position, Quaternion.identity);
+        if (toInst.level > 1) toInst.transform.localScale *= Mathf.Pow(1.1f, toInst.level - 1);
+        inst.GetComponent<CharacterController>().SetValuesCharacter(ChampionDatabase.GetDatabaseCharacterController(toInst.level, toInst.GetComponent<CharacterController>().characterName));
+        inst.GetComponent<DragObject>().hitTile = toInst.standingTile;
+        inst.GetComponent<CharacterController>().standingTile = toInst.standingTile;
+        inst.GetComponent<CharacterController>().upgradedStats = toInst.upgradedStats;
+        inst.GetComponent<CharacterController>().upgradePoints = toInst.upgradePoints;
+        inst.GetComponent<CharacterController>().fightsPlayed = toInst.fightsPlayed;
+        inst.tag = tag;
+        inst.name = inst.GetComponent<CharacterController>().characterName;
+        HealthBarDetails.Add(inst);
+        return inst;
+    }
     public static void InstantiateEnemy(GameObject spawnTile, string enemyName)
     {
         GameObject _spawnPosition = spawnTile;
@@ -63,6 +78,8 @@ public class CharacterInstantiator: MonoBehaviour
         inst.GetComponent<CharacterController>().health = 1100;
         HealthBarDetails.Add(inst);
     }
+
+
     //----------------------------------------Bench maipulation functions
     private static GameObject[] ResetBench()
     {
