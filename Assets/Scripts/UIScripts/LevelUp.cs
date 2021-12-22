@@ -29,7 +29,7 @@ public class LevelUp : MonoBehaviour
         }
 
 
-        levelText.text = level.ToString();
+        levelText.text = "Lvl. " + level.ToString();
         levelProgressionText.text = xp + "/" + xpForNextLevel;
 
         GameObject[] levelProgImages = GameObject.FindGameObjectsWithTag("LevelProgressionBarImage");

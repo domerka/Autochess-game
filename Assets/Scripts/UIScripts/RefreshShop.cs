@@ -10,18 +10,24 @@ public class RefreshShop : MonoBehaviour
     private TextMeshProUGUI nextIncomeText;
     private GameObject goldInterestBar;
     private Button refreshShopButton;
+    private TextMeshProUGUI playerStreakText;
+
     private void Awake()
     {
-        goldText = this.transform.FindDeepChild("GoldText").gameObject.GetComponent<TextMeshProUGUI>();
-        nextIncomeText = this.transform.FindDeepChild("NextIncomeText").gameObject.GetComponent<TextMeshProUGUI>();
-        goldInterestBar = this.transform.FindDeepChild("GoldInterestBar").gameObject;
-        refreshShopButton = this.transform.FindDeepChild("RefreshShopButton").gameObject.GetComponent<Button>();
+        goldText = transform.FindDeepChild("GoldText").gameObject.GetComponent<TextMeshProUGUI>();
+        nextIncomeText = transform.FindDeepChild("NextIncomeText").gameObject.GetComponent<TextMeshProUGUI>();
+        goldInterestBar = transform.FindDeepChild("GoldInterestBar").gameObject;
+        refreshShopButton = transform.FindDeepChild("RefreshShopButton").gameObject.GetComponent<Button>();
+        playerStreakText = transform.FindDeepChild("StreakText").gameObject.GetComponent<TextMeshProUGUI>();
+        playerStreakText.text = "0";
     }
 
-    public void UpdateUI(int gold, int nextIncome, int maxIncome)
+    public void UpdateUI(int gold, int nextIncome, int maxIncome, int playerStreak)
     {
         goldText.text = gold.ToString();
         nextIncomeText.text = nextIncome.ToString();
+        playerStreakText.text = Mathf.Abs(playerStreak).ToString();
+        playerStreakText.color = playerStreak >= 0 ? Color.red : Color.blue;
 
         for (int i = 0; i < maxIncome/10; i++)
         {

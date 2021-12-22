@@ -32,7 +32,7 @@ public class LevelController : MonoBehaviour
         numOfStages = 5;
         stageCounter = -1;
 
-        preparationStageLength = 15.0f;
+        preparationStageLength = 5.0f;
         fightLength = 30.0f;
         overTimeLength = 10.0f;
         loadingStageLength = 2.0f;
@@ -44,7 +44,6 @@ public class LevelController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
         gameController = GameObject.FindGameObjectWithTag("GameControl").GetComponent<GameController>();
         gameController.ManageOpponentStrength();
     }

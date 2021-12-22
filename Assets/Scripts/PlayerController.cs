@@ -34,12 +34,14 @@ public class PlayerController : MonoBehaviour
 
     private int skillPoints;
 
-    //healthBar
-
-
+    private Image playerHealthBar;
+    private TextMeshProUGUI playerSkillPointText;
     // Start is called before the first frame update
     void Start()
     {
+        playerHealthBar = transform.FindDeepChild("Fill").GetComponent<Image>();
+        playerSkillPointText = transform.FindDeepChild("SkillPointText").GetComponent<TextMeshProUGUI>();
+        playerSkillPointText.text = "1";
         animationController = this.GetComponent<Animator>();
 
         fightStreak = 0;
@@ -115,10 +117,7 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(int amount)
     {
         health -= amount;
-
-        GameObject.FindGameObjectWithTag("UIController").gameObject.transform.FindDeepChild("PlayerHealthBar").GetComponent<Image>().fillAmount = health / 100.0f;
-
-        GameObject.FindGameObjectWithTag("UIController").gameObject.transform.FindDeepChild("PlayerHealthText").GetComponent<TextMeshProUGUI>().text = health.ToString();
+        playerHealthBar.fillAmount = health / 100.0f;
 
         if (health <= 0)
         {
@@ -159,6 +158,7 @@ public class PlayerController : MonoBehaviour
     public void AddSkillPoints(int amount)
     {
         skillPoints += amount;
+        playerSkillPointText.text = skillPoints.ToString();
     }
     public int GetSkillPoints()
     {

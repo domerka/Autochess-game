@@ -121,11 +121,15 @@ public class DragObject : MonoBehaviour
             {
                 character.tag = hitTile.name.Length < 2 ? "OnBench" : "Ally";
                 hitTile.tag = "OccupiedByAlly";
+                startTile.tag = "Free";
                 transform.position = hitTile.transform.position;
                 character.standingTile = hitTile;
-                TeamCombinationDatabase.Instance.AddCharacter(character);
-                gameController.AddCharacterOnBoard(gameObject);
-                gameController.RemoveCharacterOnBench(gameObject);
+                if (gameController.GetTeamSize() != gameController.GetNumberOfChampionsOnBoard())
+                {
+                    TeamCombinationDatabase.Instance.AddCharacter(character);
+                    gameController.AddCharacterOnBoard(gameObject);
+                    gameController.RemoveCharacterOnBench(gameObject);
+                }
             }
             else
             {

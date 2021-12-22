@@ -179,9 +179,6 @@ public class GameController : MonoBehaviour
         if (upgradedSkillTreeNumbers.Contains(5)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().AddHealth(50);
         if (upgradedSkillTreeNumbers.Contains(6)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().AddDamage(10);
         if (upgradedSkillTreeNumbers.Contains(7)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().AddMagicDamage(10);
-        if (upgradedSkillTreeNumbers.Contains(8)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetBaseHealing(80);
-        if (upgradedSkillTreeNumbers.Contains(9)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetAttackDamageHealing(10);
-        if (upgradedSkillTreeNumbers.Contains(10)) foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetMagicDamageHealing(10);
         if (upgradedSkillTreeNumbers.Contains(11)) AddXp(1);
         if (upgradedSkillTreeNumbers.Contains(12)) if(onBenchAllies.Count == 0) AddXp(2);
         if (upgradedSkillTreeNumbers.Contains(13)) gold += Mathf.FloorToInt(onBoardAllies.Count / 2);
@@ -203,6 +200,7 @@ public class GameController : MonoBehaviour
         { 
             unit.GetComponent<CharacterController>().standingTile.tag = "Free";
             Destroy(unit);
+            RemoveCharacterOnBoard(unit);
         }
         //Destroy enemys
         foreach (GameObject unit in GameObject.FindGameObjectsWithTag("Enemy"))
@@ -210,7 +208,6 @@ public class GameController : MonoBehaviour
             unit.GetComponent<CharacterController>().standingTile.tag = "Free";
             Destroy(unit);
         }
-        onBoardAllies.Clear();
     }
     private void ResetBoard()
     {
@@ -225,7 +222,7 @@ public class GameController : MonoBehaviour
             }
         }
         //Readd units to OG position
-        foreach (CharacterController unit in savedAlliesBeforeFight) onBoardAllies.Add(CharacterInstantiator.InstantiateAfterFight(unit));
+        foreach (CharacterController unit in savedAlliesBeforeFight) AddCharacterOnBoard(CharacterInstantiator.InstantiateAfterFight(unit));
         //Delete copies
         foreach (GameObject unit in GameObject.FindGameObjectsWithTag("Copy")) Destroy(unit);
 
@@ -489,12 +486,15 @@ public class GameController : MonoBehaviour
                 upgradedSkillTreeNumbers.Add(7);
                 break;
             case (8)://Add baseHealing
+                foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetBaseHealing(80);
                 upgradedSkillTreeNumbers.Add(8);
                 break;
             case (9)://Add healing based off attackDamge
+                foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetAttackDamageHealing(10);
                 upgradedSkillTreeNumbers.Add(9);
                 break;
             case (10)://Add healing based off magicDamge
+                foreach (GameObject unit in onBoardAllies) unit.GetComponent<CharacterController>().SetMagicDamageHealing(10);
                 upgradedSkillTreeNumbers.Add(10);
                 break;
             case (11)://Every turn gain one xp
@@ -573,6 +573,15 @@ public class GameController : MonoBehaviour
 
                 break;
             case (35)://Your units gain stats based on how many wins you have
+                foreach (GameObject unit in onBoardAllies)
+                {
+                    unit.GetComponent<CharacterController>().AddHealth(500);
+                    unit.GetComponent<CharacterController>().AddDamage(50);
+                    unit.GetComponent<CharacterController>().AddMagicDamage(50);
+                    unit.GetComponent<CharacterController>().armor += 30;
+                    unit.GetComponent<CharacterController>().magicDamage += 30;
+                    unit.GetComponent<CharacterController>().attackSpeed += 1.5f;
+                }
                 upgradedSkillTreeNumbers.Add(35);
                 break;
             case (36)://Lower opponent strength by one
@@ -714,6 +723,20 @@ public class GameController : MonoBehaviour
 
     public void AddCharacterOnBoard(GameObject character)
     {
+        if (upgradedSkillTreeNumbers.Contains(8)) character.GetComponent<CharacterController>().SetBaseHealing(80);
+        if (upgradedSkillTreeNumbers.Contains(9)) character.GetComponent<CharacterController>().SetAttackDamageHealing(10);
+        if (upgradedSkillTreeNumbers.Contains(10)) character.GetComponent<CharacterController>().SetMagicDamageHealing(10);
+        if (upgradedSkillTreeNumbers.Contains(35))
+        {
+            character.GetComponent<CharacterController>().AddHealth(500);
+            character.GetComponent<CharacterController>().AddDamage(50);
+            character.GetComponent<CharacterController>().AddMagicDamage(50);
+            character.GetComponent<CharacterController>().armor += 30;
+            character.GetComponent<CharacterController>().magicDamage += 30;
+            character.GetComponent<CharacterController>().attackSpeed += 1.5f;
+            HealthBarDetails.Add(character);
+        }
+
         onBoardAllies.Add(character);
         uiController.UpdateTeamSizeUI();
     }
@@ -724,6 +747,19 @@ public class GameController : MonoBehaviour
     }
     public void RemoveCharacterOnBoard(GameObject character)
     {
+        if (upgradedSkillTreeNumbers.Contains(8)) character.GetComponent<CharacterController>().SetBaseHealing(0);
+        if (upgradedSkillTreeNumbers.Contains(9)) character.GetComponent<CharacterController>().SetAttackDamageHealing(0);
+        if (upgradedSkillTreeNumbers.Contains(10)) character.GetComponent<CharacterController>().SetMagicDamageHealing(0);
+        if (upgradedSkillTreeNumbers.Contains(35))
+        {
+            character.GetComponent<CharacterController>().health-= 500;
+            character.GetComponent<CharacterController>().attackDamage -= 50;
+            character.GetComponent<CharacterController>().magicDamage -= 50;
+            character.GetComponent<CharacterController>().armor -= 30;
+            character.GetComponent<CharacterController>().magicDamage -= 30;
+            character.GetComponent<CharacterController>().attackSpeed -= 1.5f;
+            HealthBarDetails.Add(character);
+        }
         onBoardAllies.Remove(character);
         uiController.UpdateTeamSizeUI();
     }

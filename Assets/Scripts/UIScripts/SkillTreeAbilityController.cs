@@ -172,14 +172,12 @@ public class SkillTreeAbilityController : MonoBehaviour
                     ability.GetComponent<SkillTreeAbility>().GetUpgradable()) ability.GetComponent<Button>().interactable = true;
             }
         }
-        uiController.UpdatePlayerInformationPanel();
         transform.GetChild(12).gameObject.GetComponent<TextMeshProUGUI>().text = player.GetSkillPoints().ToString();
     }
     public int GetSkillPoints()
     {
         return player.GetSkillPoints();
     }
-
     public void AddSkillPoints(int amount)
     {
         player.AddSkillPoints(amount);
@@ -190,7 +188,6 @@ public class SkillTreeAbilityController : MonoBehaviour
                 ability.GetComponent<Button>().interactable = false;
             }
         }
-        uiController.UpdatePlayerInformationPanel();
     }
 
 

@@ -21,7 +21,6 @@ public class UIController : MonoBehaviour
     private LevelUp levelUp;
     private RefreshShop refreshShop;
     public ShopInstantiator shopInstantiator;
-    private PlayerInformationPanel playerInformationPanel;
     private TextMeshProUGUI teamSizeText;
     private PlayerController player;
     private GameObject garbageLeft;
@@ -46,7 +45,6 @@ public class UIController : MonoBehaviour
         levelUp = transform.FindDeepChild("LevelUp").gameObject.GetComponent<LevelUp>();
         refreshShop = transform.FindDeepChild("RefreshShop").gameObject.GetComponent<RefreshShop>();
         shopInstantiator = transform.FindDeepChild("ShopPictures").gameObject.GetComponent<ShopInstantiator>();
-        playerInformationPanel = transform.FindDeepChild("PlayerInformationPanel").gameObject.GetComponent<PlayerInformationPanel>();
         player = GameObject.FindGameObjectWithTag("PlayerController").GetComponent<PlayerController>();
         garbageLeft = transform.FindDeepChild("GarbageLeft").gameObject;
         garbageRight = transform.FindDeepChild("GarbageRight").gameObject;
@@ -244,7 +242,6 @@ public class UIController : MonoBehaviour
         UpdateUIOnGoldSpent();
         UpdateUIOnLevelUp();
         UpdateTeamSizeUI();
-        UpdatePlayerInformationPanel();
         RefreshShop();
     }
     public void UpdateUIOnLevelUp()
@@ -261,12 +258,8 @@ public class UIController : MonoBehaviour
     public void UpdateUIOnGoldSpent()
     {
         UpdateUIOnLevelUp();
-        refreshShop.UpdateUI(gameController.GetGold(), gameController.GetNextIncome(),gameController.GetMaxIncome());
+        refreshShop.UpdateUI(gameController.GetGold(), gameController.GetNextIncome(),gameController.GetMaxIncome(), GameObject.FindGameObjectWithTag("PlayerController").GetComponent<PlayerController>().GetStreak());
         shopInstantiator.UpdateUI(gameController.GetGold());
-    }
-    public void UpdatePlayerInformationPanel()
-    {
-        playerInformationPanel.UpdateUI(player.GetStreak(), player.GetHealth(), player.GetSkillPoints(),player.GetHealth());
     }
     public void UpdateOSB(float amount)
     {
@@ -349,12 +342,10 @@ public class UIController : MonoBehaviour
     {
         isOverGarbage = set;
     }
-
     public void AddSkillTreeBonus(int serialNumber)
     {
         gameController.AddSkillTreeBonus(serialNumber);
     }
-
     public void AddBarToInterestBar()
     {
         refreshShop.AddBarToInterestBar();
