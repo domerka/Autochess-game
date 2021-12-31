@@ -20,6 +20,7 @@ public class CharacterController : MonoBehaviour
     public int magicDamage;
     public int attackDamage;
     public int critChance;
+    public int critDamage;
 
     public int attackDamageHealing;
     public int magicDamageHealing;
@@ -38,7 +39,7 @@ public class CharacterController : MonoBehaviour
     public bool ranged;
     public bool stunned;
 
-    public List<string> upgradedStats;
+    public List<string> upgradedStats = new List<string>();
     public int upgradePoints;
     public int fightsPlayed;
 
@@ -57,19 +58,17 @@ public class CharacterController : MonoBehaviour
     {
         sellable = true;
         putDown = false;
-        upgradedStats = new List<string>();
         fightsPlayed = 0;
         baseHealing = 0;
         healthBar = transform.gameObject.GetComponent<HealthBar>();
         manaBar = transform.gameObject.GetComponent<ManaBar>();
-        moveSpeed = 2.0f; 
+        moveSpeed = 2.0f;
+        critDamage = 100;
     }
-
-    private void Start()
+    /*private void Start()
     {
-        upgradedStats = new List<string>();
-    }
-
+        fightsPlayed = 0;
+    }*/
     //Needed for database creation
     public CharacterController(
         string _championName, float _health, string _type, int _attackRange, float _attackSpeed, string _className,
@@ -132,6 +131,8 @@ public class CharacterController : MonoBehaviour
     {
         switch (statName)
         {
+            case "maxHealth":
+                return maxHealth.ToString();
             case "health":
                 return health.ToString();
             case "armor":
@@ -148,20 +149,29 @@ public class CharacterController : MonoBehaviour
                 return attackRange.ToString();
             case "critChance":
                 return critChance.ToString();
+            case "maxMana":
+                return maximumMana.ToString();
+            case "mana":
+                return manaBar.GetComponent<ManaBar>().currentMana.ToString();
         }
         return null;
     }
 
     public void OnCharacterInformationButtonClicked(string buttonName)
     {
+        if (upgradedStats == null) upgradedStats = new List<string>();
         upgradePoints --;
         switch (buttonName)
         {
             case "healthButton":
                 upgradedStats.Add("health");
-                health += 500;
-                gameObject.GetComponent<CharacterInformationController>().UpdateText("health",health);
+                maxHealth += 500;
+                gameObject.GetComponent<CharacterInformationController>().UpdateText("health",maxHealth);
                 HealthBarDetails.Add(gameObject);
+                break;
+            case "manaButton":
+                upgradedStats.Add("mana");
+                maximumMana -= 30;
                 break;
             case "armorButton":
                 upgradedStats.Add("armor");
@@ -197,6 +207,11 @@ public class CharacterController : MonoBehaviour
                 upgradedStats.Add("critChance");
                 critChance += 30;
                 gameObject.GetComponent<CharacterInformationController>().UpdateText("critChance", critChance);
+                break;
+            case "critDamageButton":
+                upgradedStats.Add("critDamage");
+                critDamage += 30;
+                gameObject.GetComponent<CharacterInformationController>().UpdateText("critDamage", critDamage);
                 break;
         }
 
@@ -288,6 +303,11 @@ public class CharacterController : MonoBehaviour
             if(health + amount > maxHealth)  health = maxHealth;
             else  health += amount;
         }
+    }
+
+    public float GetCurrentMana()
+    {
+        return manaBar.GetComponent<ManaBar>().currentMana;
     }
 
     public void SetAttackDamageHealing(int amount)

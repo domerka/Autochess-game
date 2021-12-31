@@ -13,6 +13,7 @@ public class InputController : MonoBehaviour
     private string pauseGameInput;
     private string skipPreparationStageInput;
     private KeyCode showFPSInput;
+    private string hideUIInput;
 
     private UIController uiController;
     private GameController gameController;
@@ -30,6 +31,7 @@ public class InputController : MonoBehaviour
         pauseGameInput = "p";
         skipPreparationStageInput = "s";
         showFPSInput = KeyCode.F11;
+        hideUIInput = "h";
 
     }
 
@@ -58,8 +60,10 @@ public class InputController : MonoBehaviour
         if (Input.GetKeyDown(pauseGameInput)) Time.timeScale = Time.timeScale == 0 ? 1 : 0;
         //Skip prep stage for gold 's'
         if (Input.GetKeyDown(skipPreparationStageInput)) levelController.SkipPreparationStage();
-        //Show FPS
+        //Show FPS 'F11'
         if (Input.GetKeyDown(showFPSInput)) uiController.ToggleFPSCounter();
+        //Hide ui 'h'
+        if (Input.GetKeyDown(hideUIInput)) uiController.HideUI();
     }
 
     private void SellCharacter()

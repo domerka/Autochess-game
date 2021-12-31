@@ -35,12 +35,10 @@ public class CharacterInstantiator: MonoBehaviour
     {
         GameObject inst = Instantiate(Resources.Load("Prefabs/" + toInst.className) as GameObject, toInst.standingTile.transform.position, Quaternion.identity);
         if (toInst.level > 1) toInst.transform.localScale *= Mathf.Pow(1.1f, toInst.level - 1);
-        inst.GetComponent<CharacterController>().SetValuesCharacter(ChampionDatabase.GetDatabaseCharacterController(toInst.level, toInst.GetComponent<CharacterController>().characterName));
+        print("Before: "  + toInst.upgradedStats.Count);
+        inst.GetComponent<CharacterController>().SetValuesCharacter(toInst);
+        print("Post: " + inst.GetComponent<CharacterController>().upgradedStats.Count);
         inst.GetComponent<DragObject>().hitTile = toInst.standingTile;
-        inst.GetComponent<CharacterController>().standingTile = toInst.standingTile;
-        inst.GetComponent<CharacterController>().upgradedStats = toInst.upgradedStats;
-        inst.GetComponent<CharacterController>().upgradePoints = toInst.upgradePoints;
-        inst.GetComponent<CharacterController>().fightsPlayed = toInst.fightsPlayed;
         inst.tag = "Ally";
         inst.name = inst.GetComponent<CharacterController>().characterName;
         HealthBarDetails.Add(inst);

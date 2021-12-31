@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
-
-
+using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
@@ -60,15 +58,25 @@ public class PlayerController : MonoBehaviour
         //Delete characterInformationPanel on left click
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100))
+            GraphicRaycaster gr = GameObject.FindGameObjectWithTag("UIController").transform.FindDeepChild("Canvas").GetComponent<GraphicRaycaster>();
+            //Create the PointerEventData with null for the EventSystem
+            PointerEventData ped = new PointerEventData(null);
+            //Set required parameters, in this case, mouse position
+            ped.position = Input.mousePosition;
+            //Create list to receive all results
+            List<RaycastResult> results = new List<RaycastResult>();
+            //Raycast it
+            gr.Raycast(ped, results);
+            bool found = false;
+            foreach(RaycastResult hit in results)
             {
-                if (!(hit.transform.name.Length > 2))
+                if (hit.gameObject.transform.name == "CharacterInformationPanel")
                 {
-                    GameObject temp = GameObject.Find("CharacterInformationPanel(Clone)");
-                    Destroy(temp);
+                    found = true;
+                    break;
                 }
             }
+            if (!found) Destroy(GameObject.Find("CharacterInformationPanel"));
             
         }
 

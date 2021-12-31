@@ -22,7 +22,6 @@ public class UIController : MonoBehaviour
     private RefreshShop refreshShop;
     public ShopInstantiator shopInstantiator;
     private TextMeshProUGUI teamSizeText;
-    private PlayerController player;
     private GameObject garbageLeft;
     private GameObject garbageRight;
     private ShopOdds shopOdds;
@@ -45,7 +44,6 @@ public class UIController : MonoBehaviour
         levelUp = transform.FindDeepChild("LevelUp").gameObject.GetComponent<LevelUp>();
         refreshShop = transform.FindDeepChild("RefreshShop").gameObject.GetComponent<RefreshShop>();
         shopInstantiator = transform.FindDeepChild("ShopPictures").gameObject.GetComponent<ShopInstantiator>();
-        player = GameObject.FindGameObjectWithTag("PlayerController").GetComponent<PlayerController>();
         garbageLeft = transform.FindDeepChild("GarbageLeft").gameObject;
         garbageRight = transform.FindDeepChild("GarbageRight").gameObject;
         shopOdds = transform.FindDeepChild("ShopOdds").gameObject.GetComponent<ShopOdds>();
@@ -353,6 +351,11 @@ public class UIController : MonoBehaviour
 
 
 
+    //TODO
+    public void HideUI()
+    {
+
+    }
     //TODO
     private void DisplayUIInformation()
     {

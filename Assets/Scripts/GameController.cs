@@ -27,7 +27,7 @@ public class GameController : MonoBehaviour
     private Dictionary<string, int> championPool;
     private Dictionary<int, string[]> spawnEnemyDictionary;
 
-    private List<CharacterController> savedAlliesBeforeFight;
+    [SerializeField]private List<CharacterController> savedAlliesBeforeFight;
 
     private UIController uiController;
 
@@ -196,7 +196,7 @@ public class GameController : MonoBehaviour
     private void DestroyAllUnits()
     {
         //Destroy allies
-        foreach (GameObject unit in onBoardAllies)
+        foreach (GameObject unit in GameObject.FindGameObjectsWithTag("Ally"))
         { 
             unit.GetComponent<CharacterController>().standingTile.tag = "Free";
             Destroy(unit);
@@ -317,10 +317,11 @@ public class GameController : MonoBehaviour
         uiController.CreateStatLayout(GameObject.FindGameObjectsWithTag("Enemy").ToList(), "Enemy", "Damage");
         uiController.CreateStatLayout(onBoardAllies, "Ally", "Heal");
         uiController.CreateStatLayout(GameObject.FindGameObjectsWithTag("Enemy").ToList(), "Enemy", "Heal");
-
         DisableMoveObjectOnBench();
         fightIsOn = true;
         fightPreparation = false;
+
+        print(GameObject.FindGameObjectWithTag("Copy").GetComponent<CharacterController>().upgradedStats[0]);
     }
     private void DisableMoveObjectOnBench()
     {
@@ -343,7 +344,6 @@ public class GameController : MonoBehaviour
             copyGameObject.tag = "Copy";
 
             CharacterController toAdd = CopyComponent<CharacterController>(unit.GetComponent<CharacterController>(), copyGameObject);
-
             savedAlliesBeforeFight.Add(toAdd);
         }
     }

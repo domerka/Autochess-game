@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ManaBar : MonoBehaviour
 {
-    private float currentMana;
+    public float currentMana;
     private float maxMana;
 
     public Slider slider;
