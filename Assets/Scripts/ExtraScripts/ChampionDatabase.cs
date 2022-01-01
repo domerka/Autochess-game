@@ -25,8 +25,9 @@ public static class ChampionDatabase
             int attackRange = int.Parse(data[i]["attackRange"].ToString(), System.Globalization.NumberStyles.Integer);
             float attackSpeed = float.Parse(data[i]["attackSpeed"].ToString(), System.Globalization.NumberStyles.Float);
             int health = int.Parse(data[i]["health"].ToString(), System.Globalization.NumberStyles.Integer);
-            string className = data[i]["className"].ToString();
-            string traitName = data[i]["traitName"].ToString();
+            string traitName_0 = data[i]["traitName0"].ToString();
+            string traitName_1 = data[i]["traitName1"].ToString();
+            string traitName_2 = data[i]["traitName2"].ToString();
             int cost = int.Parse(data[i]["cost"].ToString(), System.Globalization.NumberStyles.Integer);
             string abilityDescription = data[i]["abilityDescription"].ToString();
             int maxMana = int.Parse(data[i]["maxMana"].ToString(), System.Globalization.NumberStyles.Integer);
@@ -38,10 +39,11 @@ public static class ChampionDatabase
             int critChance = int.Parse(data[i]["critChance"].ToString(), System.Globalization.NumberStyles.Integer);
             string projectileName = data[i]["projectileName"].ToString();
             bool ranged = int.Parse(data[i]["armor"].ToString(), System.Globalization.NumberStyles.Integer) == 0 ? false : true;
+            int critdamage = int.Parse(data[i]["critDamage"].ToString(), System.Globalization.NumberStyles.Integer);
 
-            CharacterController character = new CharacterController(name, health, "Ally", attackRange, attackSpeed, className, traitName,
+            CharacterController character = new CharacterController(name, health, "Ally", attackRange, attackSpeed, traitName_0, traitName_1,traitName_2,
                                                                     1, cost, abilityDescription, maxMana, startingMana, armor, magicResist,
-                                                                    magicDamage, attackDamage, critChance, ranged, projectileName);
+                                                                    magicDamage, attackDamage, critChance, ranged, projectileName,critdamage);
             temp.Add(name, character);
         }
         championDatabase.Add(level, temp);

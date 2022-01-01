@@ -6,8 +6,8 @@ using UnityEngine;
 public class CharacterController : MonoBehaviour
 {
     public string characterName;
-    public string className;
-    public string traitName;
+
+    public List<string> traitNames = new List<string>();
 
     public string type;
 
@@ -62,30 +62,31 @@ public class CharacterController : MonoBehaviour
         baseHealing = 0;
         healthBar = transform.gameObject.GetComponent<HealthBar>();
         manaBar = transform.gameObject.GetComponent<ManaBar>();
+       
         moveSpeed = 2.0f;
         critDamage = 100;
     }
-    /*private void Start()
-    {
-        fightsPlayed = 0;
-    }*/
     //Needed for database creation
     public CharacterController(
-        string _championName, float _health, string _type, int _attackRange, float _attackSpeed, string _className,
-        string _traitName, int _level, int _cost, string _abilityDescription, int _maxMana, int _startingMana,
-        int _armor, int _magicResist, int _magicDamage, int _attackDamage, int _critChance, bool _ranged, string _projectileName)
+        string _championName, float _health, string _type, int _attackRange, float _attackSpeed, string _traitName_0,
+        string _traitName_1,string _traitName_2, int _level, int _cost, string _abilityDescription, int _maxMana, int _startingMana,
+        int _armor, int _magicResist, int _magicDamage, int _attackDamage, int _critChance, bool _ranged, string _projectileName, int _critDamage)
     {
+        upgradedStats = new List<string>();
+        traitNames = new List<string>();
         maxHealth = _health;
         characterName = _championName;
         health = _health;
         type = _type;
         attackRange = _attackRange;
         attackSpeed = _attackSpeed;
-        className = _className;
+        traitNames.Add(_traitName_0);
+        traitNames.Add(_traitName_1);
+        traitNames.Add(_traitName_2);
         level = _level;
         cost = _cost;
         abilityDescription = _abilityDescription;
-        traitName = _traitName;
+        
         maximumMana = _maxMana;
         startingMana = _startingMana;
         armor = _armor;
@@ -96,22 +97,24 @@ public class CharacterController : MonoBehaviour
         ranged = _ranged;
         projectileName = _projectileName;
         putDown = false;
+        critDamage = _critDamage;
     }
 
 
     public void SetValuesCharacter(CharacterController character)
     {
+        upgradedStats = new List<string>();
+        traitNames = new List<string>();
         maxHealth = character.health;
         characterName = character.characterName;
         health = character.health;
         type = character.type;
         attackRange = character.attackRange;
         attackSpeed = character.attackSpeed;
-        className = character.className;
+        traitNames = character.traitNames;
         level = character.level;
         cost = character.cost;
         abilityDescription = character.abilityDescription;
-        traitName = character.traitName;
         maximumMana = character.maximumMana;
         startingMana = character.startingMana;
         armor = character.armor;
@@ -125,6 +128,7 @@ public class CharacterController : MonoBehaviour
         fightsPlayed = character.fightsPlayed;
         ranged = character.ranged;
         projectileName = character.projectileName;
+        critDamage = character.critDamage;
     }
 
     public string GetStatsString(string statName)
@@ -153,6 +157,8 @@ public class CharacterController : MonoBehaviour
                 return maximumMana.ToString();
             case "mana":
                 return manaBar.GetComponent<ManaBar>().currentMana.ToString();
+            case "critDamage":
+                return critDamage.ToString();
         }
         return null;
     }
@@ -167,6 +173,7 @@ public class CharacterController : MonoBehaviour
                 upgradedStats.Add("health");
                 maxHealth += 500;
                 gameObject.GetComponent<CharacterInformationController>().UpdateText("health",maxHealth);
+                traitNames.Add("some");
                 HealthBarDetails.Add(gameObject);
                 break;
             case "manaButton":
@@ -219,6 +226,9 @@ public class CharacterController : MonoBehaviour
 
         gameObject.GetComponent<CharacterInformationController>().SetImage(buttonName.Substring(0, buttonName.Length - 6));
     }
+
+
+
 
     public void AddUpgradePoint()
     {

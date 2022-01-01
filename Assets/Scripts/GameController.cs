@@ -320,8 +320,6 @@ public class GameController : MonoBehaviour
         DisableMoveObjectOnBench();
         fightIsOn = true;
         fightPreparation = false;
-
-        print(GameObject.FindGameObjectWithTag("Copy").GetComponent<CharacterController>().upgradedStats[0]);
     }
     private void DisableMoveObjectOnBench()
     {

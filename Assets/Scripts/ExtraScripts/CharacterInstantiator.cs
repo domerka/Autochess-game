@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class CharacterInstantiator: MonoBehaviour
 {
-    public static GameObject InstantiateFromShop(string charcterName)
+    public static GameObject InstantiateFromShop(string characterName)
     {
-        CharacterController character = ChampionDatabase.GetDatabaseCharacterController(1, charcterName);
+        CharacterController character = ChampionDatabase.GetDatabaseCharacterController(1, characterName);
 
         GameObject prefab;
-        prefab = Resources.Load("Prefabs/" + charcterName) as GameObject;
+        prefab = Resources.Load("Prefabs/" + characterName) as GameObject;
 
         GameObject[] bench = ResetBench();
 
@@ -19,6 +19,7 @@ public class CharacterInstantiator: MonoBehaviour
             GameObject inst = Instantiate(prefab, bench[0].transform.position, Quaternion.identity);
             inst.GetComponent<DragObject>().hitTile = bench[0];
             inst.GetComponent<CharacterController>().SetValuesCharacter(character);
+            inst.GetComponent<CharacterController>().upgradedStats = new List<string>();
             inst.GetComponent<CharacterController>().standingTile = bench[0];
             inst.name = inst.GetComponent<CharacterController>().characterName;
             inst.tag = "OnBench";
@@ -33,11 +34,9 @@ public class CharacterInstantiator: MonoBehaviour
     }
     public static GameObject InstantiateAfterFight(CharacterController toInst)
     {
-        GameObject inst = Instantiate(Resources.Load("Prefabs/" + toInst.className) as GameObject, toInst.standingTile.transform.position, Quaternion.identity);
+        GameObject inst = Instantiate(Resources.Load("Prefabs/" + toInst.characterName) as GameObject, toInst.standingTile.transform.position, Quaternion.identity);
         if (toInst.level > 1) toInst.transform.localScale *= Mathf.Pow(1.1f, toInst.level - 1);
-        print("Before: "  + toInst.upgradedStats.Count);
         inst.GetComponent<CharacterController>().SetValuesCharacter(toInst);
-        print("Post: " + inst.GetComponent<CharacterController>().upgradedStats.Count);
         inst.GetComponent<DragObject>().hitTile = toInst.standingTile;
         inst.tag = "Ally";
         inst.name = inst.GetComponent<CharacterController>().characterName;
@@ -46,7 +45,7 @@ public class CharacterInstantiator: MonoBehaviour
     }
     public static GameObject InstantiateLoadGame(CharacterController toInst,string tag)
     {
-        GameObject inst = Instantiate(Resources.Load("Prefabs/" + toInst.className) as GameObject, toInst.standingTile.transform.position, Quaternion.identity);
+        GameObject inst = Instantiate(Resources.Load("Prefabs/" + toInst.characterName) as GameObject, toInst.standingTile.transform.position, Quaternion.identity);
         if (toInst.level > 1) toInst.transform.localScale *= Mathf.Pow(1.1f, toInst.level - 1);
         inst.GetComponent<CharacterController>().SetValuesCharacter(ChampionDatabase.GetDatabaseCharacterController(toInst.level, toInst.GetComponent<CharacterController>().characterName));
         inst.GetComponent<DragObject>().hitTile = toInst.standingTile;

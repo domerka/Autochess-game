@@ -1553,6 +1553,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
@@ -4391,6 +4392,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
@@ -10319,6 +10321,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   teamSize: 0
   fightIsOn: 0
+  savedAlliesBeforeFight: []
   onBoardAllies: []
   onBenchAllies: []
 --- !u!4 &1321819496
@@ -14174,7 +14177,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2118349473}
   - component: {fileID: 2118349475}
-  - component: {fileID: 2118349474}
   m_Layer: 5
   m_Name: TeamSizeImage
   m_TagString: Untagged
@@ -14201,28 +14203,6 @@ RectTransform:
   m_AnchoredPosition: {x: -56.7, y: -0.0000023842}
   m_SizeDelta: {x: 29.7275, y: 36.4713}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2118349474
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2118349472}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef8b96895a0ec4ba685178a052544251, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 2e4ba26f06c0a2a4f812212e309593f6, type: 3}
-  m_PreserveAspect: 0
 --- !u!222 &2118349475
 CanvasRenderer:
   m_ObjectHideFlags: 0

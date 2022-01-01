@@ -27,11 +27,11 @@ public sealed class TeamCombinationDatabase
         {
             characterNames.Add(character.characterName,1);
 
-            if (teamCombinations.ContainsKey(character.traitName)) teamCombinations[character.traitName]++;
-            else teamCombinations.Add(character.traitName, 1);
-
-            if (teamCombinations.ContainsKey(character.className)) teamCombinations[character.className]++;
-            else teamCombinations.Add(character.className, 1);
+            foreach(string traitName in character.traitNames)
+            {
+                if (teamCombinations.ContainsKey(traitName)) teamCombinations[traitName]++;
+                else teamCombinations.Add(traitName, 1);
+            }
         }
         else
         {
@@ -45,10 +45,11 @@ public sealed class TeamCombinationDatabase
         {
             if (characterNames[character.characterName] == 1)
             {
-                if (teamCombinations[character.traitName] == 1) teamCombinations.Remove(character.traitName);
-                else teamCombinations[character.traitName]--;
-                if (teamCombinations[character.className] == 1) teamCombinations.Remove(character.className);
-                else teamCombinations[character.className]--;
+                foreach(string traitName in character.traitNames)
+                {
+                    if (teamCombinations[traitName] == 1) teamCombinations.Remove(traitName);
+                    else teamCombinations[traitName]--;
+                }
             }
             else
             {
