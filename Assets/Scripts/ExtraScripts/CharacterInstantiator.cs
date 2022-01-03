@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CharacterInstantiator: MonoBehaviour
 {
+    public static int id;
+
     public static GameObject InstantiateFromShop(string characterName)
     {
         CharacterController character = ChampionDatabase.GetDatabaseCharacterController(1, characterName);
@@ -21,6 +23,7 @@ public class CharacterInstantiator: MonoBehaviour
             inst.GetComponent<CharacterController>().SetValuesCharacter(character);
             inst.GetComponent<CharacterController>().upgradedStats = new List<string>();
             inst.GetComponent<CharacterController>().standingTile = bench[0];
+            inst.GetComponent<CharacterController>().id = id++;
             inst.name = inst.GetComponent<CharacterController>().characterName;
             inst.tag = "OnBench";
             inst.GetComponent<MoveObject>().enabled = false;
@@ -70,6 +73,7 @@ public class CharacterInstantiator: MonoBehaviour
         _spawnPosition.GetComponent<Tile>().isObstacle = true;
         inst.GetComponent<CharacterController>().attackRange = 1;
         inst.GetComponent<CharacterController>().attackDamage = 150;
+        inst.GetComponent<CharacterController>().id = id++;
         inst.GetComponentInChildren<Renderer>().material.color = Color.red;
         Destroy(inst.GetComponent<DragObject>());
         inst.GetComponent<CharacterController>().health = 1100;

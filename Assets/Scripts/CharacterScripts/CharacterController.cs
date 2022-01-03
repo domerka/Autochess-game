@@ -5,6 +5,8 @@ using UnityEngine;
 [System.Serializable]
 public class CharacterController : MonoBehaviour
 {
+    public int id;
+
     public string characterName;
 
     public List<string> traitNames = new List<string>();
@@ -103,6 +105,7 @@ public class CharacterController : MonoBehaviour
 
     public void SetValuesCharacter(CharacterController character)
     {
+        id = character.id;
         upgradedStats = new List<string>();
         traitNames = new List<string>();
         maxHealth = character.health;

@@ -8,9 +8,9 @@ using TMPro;
 
 public class CharacterInformationController : MonoBehaviour
 {
-    CharacterController characterController;
+    public CharacterController characterController;
 
-    public GameObject charInfoPanel;
+    private GameObject charInfoPanel;
 
     private Camera camera1;
 
@@ -29,7 +29,7 @@ public class CharacterInformationController : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             characterController = gameObject.GetComponent<CharacterController>();
-            Vector2 screenPoint = camera1.WorldToScreenPoint(gameObject.transform.position);
+            /*Vector2 screenPoint = camera1.WorldToScreenPoint(gameObject.transform.position);
 
             float xFloat = screenPoint.x / Screen.width;
             float yFloat = screenPoint.y / Screen.height;
@@ -37,15 +37,18 @@ public class CharacterInformationController : MonoBehaviour
             float tempX = xFloat * 1920;
             float tempY = yFloat * 1080;
 
-            Vector2 solution = new Vector2(-(1920 - tempX),-( 1080 - tempY));
+            Vector2 solution = new Vector2(-(1920 - tempX),-( 1080 - tempY));*/
 
             GameObject temp = GameObject.Find("CharacterInformationPanel");
-            if(temp != null) Destroy(temp);
+            if (temp != null) Destroy(temp); 
 
             charInfoPanel = Resources.Load("Prefabs/CharacterInformationPanel") as GameObject;
             GameObject inst = Instantiate(charInfoPanel, new Vector3(0,0,0), Quaternion.identity, GameObject.FindGameObjectWithTag("Canvas").transform);
+
+            Vector2 position = new Vector2(inst.transform.GetComponent<RectTransform>().sizeDelta.x/2, -inst.transform.GetComponent<RectTransform>().sizeDelta.y/2);
+
             inst.SetActive(false);
-            inst.GetComponent<RectTransform>().anchoredPosition = solution;
+            inst.GetComponent<RectTransform>().anchoredPosition = position;
             inst.name = "CharacterInformationPanel";
 
             //Fill name
@@ -58,9 +61,27 @@ public class CharacterInformationController : MonoBehaviour
             SetupButtons(inst);
 
             inst.SetActive(true);
+
+            CharacterInformationPanel.SetId(gameObject.GetComponent<CharacterController>().id);
         }
     }
 
+    public void UpdateHealthBar(float fillAmount)
+    {
+        GameObject.FindGameObjectWithTag("CharInfoPanel").transform.FindDeepChild("healthFill").GetComponent<Image>().fillAmount = fillAmount;
+    }
+    public void UpdateHealthText(int amount)
+    {
+        GameObject.FindGameObjectWithTag("CharInfoPanel").transform.FindDeepChild("healthText").GetComponent<TextMeshProUGUI>().text = amount.ToString();
+    }
+    public void UpdateManaBar(float fillAmount)
+    {
+        GameObject.FindGameObjectWithTag("CharInfoPanel").transform.FindDeepChild("manaFill").GetComponent<Image>().fillAmount = fillAmount;
+    }
+    public void UpdateManaText(int amount)
+    {
+        GameObject.FindGameObjectWithTag("CharInfoPanel").transform.FindDeepChild("manaText").GetComponent<TextMeshProUGUI>().text = amount.ToString();
+    }
     private void FillStats(GameObject inst)
     {
         for (int i = 0; i < 10; i++)
@@ -68,13 +89,13 @@ public class CharacterInformationController : MonoBehaviour
             if (i == 0)
             {
                 inst.transform.FindDeepChild(informationNames[i] + "Text").GetComponent<TextMeshProUGUI>().text = characterController.GetStatsString(informationNames[i]) + "/" + characterController.GetStatsString("maxHealth");
-                inst.transform.FindDeepChild("healthFill").GetComponent<Image>().fillAmount = characterController.health / characterController.maxHealth;
+                inst.transform.FindDeepChild("healthFill").GetComponent<Image>().fillAmount = gameObject.GetComponent<HealthBar>().CalculateHealth();
                 continue;
             }
             if (i == 8)
             {
                 inst.transform.FindDeepChild(informationNames[i] + "Text").GetComponent<TextMeshProUGUI>().text = characterController.GetStatsString(informationNames[i]) + "/" + characterController.GetStatsString("maxMana");
-                inst.transform.FindDeepChild("manaFill").GetComponent<Image>().fillAmount = characterController.GetCurrentMana() / characterController.maximumMana;
+                inst.transform.FindDeepChild("manaFill").GetComponent<Image>().fillAmount = gameObject.GetComponent<ManaBar>().CalculateMana();
                 continue;
             }
             inst.transform.FindDeepChild(informationNames[i] + "Text").GetComponent<TextMeshProUGUI>().text = characterController.GetStatsString(informationNames[i]);
@@ -122,7 +143,7 @@ public class CharacterInformationController : MonoBehaviour
 
     public void UpdateText(string statName,float amount)
     {
-        GameObject temp = GameObject.Find("CharacterInformationPanel");
+        GameObject temp = GameObject.FindGameObjectWithTag("CharInfoPanel");
         if(statName == "health")
         {
             temp.transform.FindDeepChild(statName + "Text").GetComponent<TextMeshProUGUI>().text = characterController.GetStatsString(informationNames[0]) + "/" + characterController.GetStatsString("maxHealth"); ;
@@ -133,7 +154,7 @@ public class CharacterInformationController : MonoBehaviour
 
     public void DisableButtons()
     {
-        GameObject temp = GameObject.Find("CharacterInformationPanel");
+        GameObject temp = GameObject.FindGameObjectWithTag("CharInfoPanel");
         for(int i = 0;i < informationNames.Length; i++)
         {
             temp.transform.FindDeepChild(informationNames[i] + "Button").GetComponent<Button>().interactable = false;
@@ -143,13 +164,15 @@ public class CharacterInformationController : MonoBehaviour
 
     public void SetImage(string statName)
     {
-        GameObject temp = GameObject.Find("CharacterInformationPanel");
+        GameObject temp = GameObject.FindGameObjectWithTag("CharInfoPanel");
         for(int i = 0; i < characterController.upgradedStats.Count;i++)
         {
             temp.transform.FindDeepChild("upgradeImage" + characterController.upgradedStats.Count).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/" + statName + "Icon");
         }
         MakeThirdUpgrade();
     }
+
+
     //TODO
     private void MakeThirdUpgrade()
     {

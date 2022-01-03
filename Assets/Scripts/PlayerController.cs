@@ -58,26 +58,7 @@ public class PlayerController : MonoBehaviour
         //Delete characterInformationPanel on left click
         if (Input.GetMouseButtonDown(0))
         {
-            GraphicRaycaster gr = GameObject.FindGameObjectWithTag("UIController").transform.FindDeepChild("Canvas").GetComponent<GraphicRaycaster>();
-            //Create the PointerEventData with null for the EventSystem
-            PointerEventData ped = new PointerEventData(null);
-            //Set required parameters, in this case, mouse position
-            ped.position = Input.mousePosition;
-            //Create list to receive all results
-            List<RaycastResult> results = new List<RaycastResult>();
-            //Raycast it
-            gr.Raycast(ped, results);
-            bool found = false;
-            foreach(RaycastResult hit in results)
-            {
-                if (hit.gameObject.transform.name == "CharacterInformationPanel")
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) Destroy(GameObject.Find("CharacterInformationPanel"));
-            
+            DestroyCharInfoPanel();
         }
 
         //Move player
@@ -109,6 +90,33 @@ public class PlayerController : MonoBehaviour
                 animationController.SetBool("Walk", true);
                 Move(pointToMoveTo);
             }
+        }
+    }
+
+    private void DestroyCharInfoPanel()
+    {
+        GraphicRaycaster gr = GameObject.FindGameObjectWithTag("UIController").transform.FindDeepChild("Canvas").GetComponent<GraphicRaycaster>();
+        //Create the PointerEventData with null for the EventSystem
+        PointerEventData ped = new PointerEventData(null);
+        //Set required parameters, in this case, mouse position
+        ped.position = Input.mousePosition;
+        //Create list to receive all results
+        List<RaycastResult> results = new List<RaycastResult>();
+        //Raycast it
+        gr.Raycast(ped, results);
+        bool found = false;
+        foreach (RaycastResult hit in results)
+        {
+            if (hit.gameObject.transform.name == "CharacterInformationPanel")
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found) 
+        {
+            CharacterInformationPanel.SetId(-1);
+            Destroy(GameObject.Find("CharacterInformationPanel")); 
         }
     }
 

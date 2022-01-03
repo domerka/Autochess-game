@@ -47,7 +47,7 @@ public class HealthBar : MonoBehaviour
         gameObject.transform.FindDeepChild("Cube").GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/DeathShader") as Material;
     }
 
-    private float CalculateHealth()
+    public float CalculateHealth()
     {
         return currentHealth / maxHealth;
     }
@@ -65,16 +65,34 @@ public class HealthBar : MonoBehaviour
             deathTimerOffset = Time.time;
             deathAnimProgress = 0.0f;
             dead = true;
+            if (CharacterInformationPanel.id == gameObject.GetComponent<CharacterController>().id)
+            {
+                CharacterInformationPanel.id = -1;
+                Destroy(GameObject.FindGameObjectWithTag("CharInfoPanel"));
+            }
+            return;
         }
         if (currentHealth > maxHealth)
         {
             currentHealth = maxHealth;
         }
+
+        if (gameObject.GetComponent<CharacterController>().id != CharacterInformationPanel.id) return;
+        gameObject.GetComponent<CharacterInformationController>().UpdateHealthBar(CalculateHealth());
+        gameObject.GetComponent<CharacterInformationController>().UpdateHealthText((int)currentHealth);
+        
+
     }
 
     public void HealDamage(float amount)
     {
         currentHealth += amount;
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
+        slider.value = CalculateHealth();
+
+        if (gameObject.GetComponent<CharacterController>().id != CharacterInformationPanel.id) return;
+        gameObject.GetComponent<CharacterInformationController>().UpdateHealthBar(CalculateHealth());
+        gameObject.GetComponent<CharacterInformationController>().UpdateHealthText((int)currentHealth);
     }
 
 }

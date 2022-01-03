@@ -16,7 +16,7 @@ public class ManaBar : MonoBehaviour
         slider = gameObject.transform.FindDeepChild("ManaBar").GetComponent<Slider>();
     }
 
-    private float CalculateMana()
+    public float CalculateMana()
     {
         return currentMana / maxMana;
     }
@@ -30,6 +30,10 @@ public class ManaBar : MonoBehaviour
     {
         currentMana = amount;
         slider.value = CalculateMana();
+
+        if (gameObject.GetComponent<CharacterController>().id != CharacterInformationPanel.id) return;
+        gameObject.GetComponent<CharacterInformationController>().UpdateManaBar(CalculateMana());
+        gameObject.GetComponent<CharacterInformationController>().UpdateManaText((int)currentMana);
     }
 
     public void AddMana(float amount)
@@ -37,6 +41,10 @@ public class ManaBar : MonoBehaviour
         currentMana += amount; 
         if (currentMana > maxMana) currentMana = maxMana;
         slider.value = CalculateMana();
+
+        if (gameObject.GetComponent<CharacterController>().id != CharacterInformationPanel.id) return;
+        gameObject.GetComponent<CharacterInformationController>().UpdateManaBar(CalculateMana());
+        gameObject.GetComponent<CharacterInformationController>().UpdateManaText((int)currentMana);
     }
 
 }

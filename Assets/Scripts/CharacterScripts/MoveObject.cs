@@ -171,10 +171,10 @@ public class MoveObject : MonoBehaviour
         if (!(target.GetComponent<CharacterController>().armor > damage))
         {
             damage -= target.GetComponent<CharacterController>().armor;
+            character.GetComponent<ManaBar>().AddMana(20);
             target.GetComponent<HealthBar>().TakeDamage(damage);
             character.damageDealt += damage;
             CreateDamagePopUp(damage);
-            character.AddMana(20);
             if (character.attackDamageHealing != 0)  character.AddHealth(Mathf.FloorToInt((damage/100)*character.attackDamageHealing));
             
         }
