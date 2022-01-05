@@ -250,6 +250,7 @@ public class GameController : MonoBehaviour
             unit.GetComponent<DragObject>().enabled = false;
             unit.GetComponent<CharacterController>().sellable = false;
             unit.GetComponent<CharacterController>().standingTile.GetComponent<Tile>().isObstacle = true;
+            unit.GetComponent<CharacterController>().AddShield(2000);
         }
         PutInUnitsAutomatically();
         ShowBoardAndBench.Show(false, showBoard);

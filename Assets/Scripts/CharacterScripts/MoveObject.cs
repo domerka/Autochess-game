@@ -90,6 +90,7 @@ public class MoveObject : MonoBehaviour
             //Choosing a new target
             if (target.GetComponent<CharacterController>() == null) target = FindClosestEnemy();
             if (target == null) target = FindClosestEnemy();
+            if (target == null) return;
             if (tileToMoveTo == null && !InRange(target))
             {
                 tileToMoveTo = PathFinding(target);

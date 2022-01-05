@@ -14,6 +14,7 @@ public class HealthBarDetails : MonoBehaviour
 
         for (int i = 1; i < healthBar.transform.childCount; i++) 
         {
+            if (healthBar.transform.GetChild(i).name == "Shield") continue;
             Destroy(healthBar.transform.GetChild(i).gameObject);
         }
 
@@ -21,9 +22,10 @@ public class HealthBarDetails : MonoBehaviour
         int tickSize = 5;
         float healthChunkSize = 250;
 
-        int numOfTicks = Mathf.FloorToInt((charControl.health - 1) / healthChunkSize);// this '-10' is because of the spacing 
-        //print("name: " + character.name + " numOfTick:" + numOfTicks);
-        float x = (characterBar.GetComponent<RectTransform>().rect.width - 10 - (tickSize * numOfTicks)) / (charControl.health / healthChunkSize);
+        int numOfTicks = Mathf.FloorToInt((charControl.maxHealth - 1) / healthChunkSize);
+                                            //                     this '-10' is because of the spacing 
+        float x = (characterBar.GetComponent<RectTransform>().rect.width  - 10 - (tickSize * numOfTicks)) / (charControl.maxHealth / healthChunkSize);
+        print(x);
         //The 250 here is the localPos of healthBar -------------------Warning
         float offset = tickSize / 2.0f - 250;
         for (int i = 1; i <= numOfTicks; i++)

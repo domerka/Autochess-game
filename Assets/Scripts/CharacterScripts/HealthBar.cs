@@ -13,11 +13,15 @@ public class HealthBar : MonoBehaviour
     private float deathAnimProgress = 0.00f;
     private float deathTimerOffset = 0.0f;
 
+    private float shieldAmount;
+    private Image shield;
+
     private void Start()
     {
         maxHealth = gameObject.GetComponent<CharacterController>().health;
         currentHealth = maxHealth;
         slider = gameObject.transform.FindDeepChild("HealthBar").GetComponent<Slider>();
+        shield = gameObject.transform.FindDeepChild("Shield").GetComponent<Image>();
         slider.value = CalculateHealth() ;
     }
 
@@ -54,6 +58,22 @@ public class HealthBar : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        if(shieldAmount != 0)
+        {
+            shieldAmount -= amount;
+            if (shieldAmount < 0)
+            {
+                shield.fillAmount = 0;
+                amount = -shieldAmount;
+                shieldAmount = 0;
+            }
+            shield.fillAmount = shieldAmount / maxHealth;
+            gameObject.GetComponent<CharacterController>().shield = shieldAmount;
+            amount = 0;
+            HealthBarDetails.Add(gameObject);
+        }
+
+
         currentHealth -= amount;
         slider.value = CalculateHealth();
 
@@ -93,6 +113,13 @@ public class HealthBar : MonoBehaviour
         if (gameObject.GetComponent<CharacterController>().id != CharacterInformationPanel.id) return;
         gameObject.GetComponent<CharacterInformationController>().UpdateHealthBar(CalculateHealth());
         gameObject.GetComponent<CharacterInformationController>().UpdateHealthText((int)currentHealth);
+    }
+
+    public void AddShield(float amount)
+    {
+        shieldAmount = amount;
+        shield.fillAmount = shieldAmount / maxHealth;
+        HealthBarDetails.Add(gameObject);
     }
 
 }

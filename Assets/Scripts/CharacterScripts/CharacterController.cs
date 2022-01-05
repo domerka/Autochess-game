@@ -13,6 +13,8 @@ public class CharacterController : MonoBehaviour
 
     public string type;
 
+    public float shield;
+
     public float maxHealth;
     public float health;
     public int attackRange;
@@ -62,6 +64,7 @@ public class CharacterController : MonoBehaviour
         putDown = false;
         fightsPlayed = 0;
         baseHealing = 0;
+        shield = 0;
         healthBar = transform.gameObject.GetComponent<HealthBar>();
         manaBar = transform.gameObject.GetComponent<ManaBar>();
        
@@ -88,7 +91,7 @@ public class CharacterController : MonoBehaviour
         level = _level;
         cost = _cost;
         abilityDescription = _abilityDescription;
-        
+        shield = 0;
         maximumMana = _maxMana;
         startingMana = _startingMana;
         armor = _armor;
@@ -127,6 +130,7 @@ public class CharacterController : MonoBehaviour
         critChance= character.critChance;
         upgradedStats = character.upgradedStats;
         upgradePoints = character.upgradePoints;
+        shield = 0;
         standingTile = character.standingTile;
         fightsPlayed = character.fightsPlayed;
         ranged = character.ranged;
@@ -330,6 +334,17 @@ public class CharacterController : MonoBehaviour
     public void SetMagicDamageHealing(int amount)
     {
         magicDamageHealing = amount;
+    }
+
+    public void AddShield(float amount)
+    {
+        shield += amount;
+        healthBar.AddShield(amount);
+    }
+
+    public HealthBar GetHealthBar()
+    {
+        return healthBar;
     }
 
 }

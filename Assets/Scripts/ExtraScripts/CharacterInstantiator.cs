@@ -77,6 +77,7 @@ public class CharacterInstantiator: MonoBehaviour
         inst.GetComponentInChildren<Renderer>().material.color = Color.red;
         Destroy(inst.GetComponent<DragObject>());
         inst.GetComponent<CharacterController>().health = 1100;
+        inst.GetComponent<CharacterController>().maxHealth = 1100;
         HealthBarDetails.Add(inst);
     }
 
